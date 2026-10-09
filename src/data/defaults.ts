@@ -42,6 +42,7 @@ export const DEFAULT_PROFILE: PlayerProfile = {
     hair: "short",
     eyes: "normal",
     usePhoto: false,
+    style: "hero",
   },
   favoritePlayer: "周東佑京（福岡ソフトバンクホークス）",
   dreamText: "周東選手のような、足が速くて守備が上手なプロ野球選手になる",

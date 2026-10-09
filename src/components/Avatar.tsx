@@ -5,6 +5,7 @@ import Character from "./Character";
 import type { AppData } from "@/lib/types";
 import { ITEM_BY_ID, type ItemDef } from "@/data/items";
 import { getBlob } from "@/lib/media";
+import { IMG } from "@/lib/img";
 
 export function equippedItems(d: AppData): Partial<Record<ItemDef["slot"], ItemDef>> {
   const out: Partial<Record<ItemDef["slot"], ItemDef>> = {};
@@ -35,13 +36,21 @@ export function useMediaUrl(id?: string): string | null {
   return id && loaded && loaded.id === id ? loaded.url : null;
 }
 
-export default function Avatar({ data, size = 200, pose, forceCharacter }: { data: AppData; size?: number; pose?: "stand" | "swing" | "ready"; forceCharacter?: boolean }) {
-  const usePhoto = data.profile.avatar.usePhoto && !!data.profile.photoId && !forceCharacter;
+export default function Avatar({ data, size = 200, pose = "stand", forceCharacter }: { data: AppData; size?: number; pose?: "stand" | "swing" | "ready"; forceCharacter?: boolean }) {
+  const style = forceCharacter ? "chara" : data.profile.avatar.style || "hero";
+  const usePhoto = style === "photo" && !!data.profile.photoId;
   const url = useMediaUrl(usePhoto ? data.profile.photoId : undefined);
   if (usePhoto && url) {
     return (
       <div className="rounded-3xl overflow-hidden border-4 border-lime shadow-xl" style={{ width: size, height: size * 1.2 }}>
         <img src={url} alt="奨也" className="w-full h-full object-cover" />
+      </div>
+    );
+  }
+  if (style === "hero" || (style === "photo" && !url)) {
+    return (
+      <div className="flex items-end justify-center" style={{ width: size, height: size * 1.2 }}>
+        <img src={IMG.hero[pose]} alt="奨也" className="max-w-full max-h-full object-contain drop-shadow-[0_10px_18px_rgba(0,0,0,0.5)]" draggable={false} />
       </div>
     );
   }

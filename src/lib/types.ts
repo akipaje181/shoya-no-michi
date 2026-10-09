@@ -175,7 +175,8 @@ export interface AvatarConfig {
   accentColor: string;
   hair: "short" | "spiky" | "cap-only";
   eyes: "normal" | "sharp" | "happy";
-  usePhoto: boolean; // 写真を選手カードに使う
+  usePhoto: boolean; // （旧）写真を選手カードに使う
+  style?: "hero" | "chara" | "photo"; // hero=イラスト（既定）、chara=装備が反映されるキャラ、photo=写真
 }
 
 export interface PlayerProfile {

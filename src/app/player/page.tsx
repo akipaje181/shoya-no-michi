@@ -11,6 +11,7 @@ import { putBlob, shrinkPhoto, validateFile } from "@/lib/media";
 import { nowISO, today, uid } from "@/lib/date";
 import type { AvatarConfig, Bats, Throws } from "@/lib/types";
 import { SLOT_LABEL, type ItemSlot } from "@/data/items";
+import { IMG } from "@/lib/img";
 
 const STAT_LABEL: Record<string, string> = { meet: "ミート", power: "パワー", speed: "走力", fielding: "守備", arm: "送球", knowledge: "野球知識" };
 
@@ -36,7 +37,7 @@ export default function PlayerPage() {
       <PageHeader title="マイ選手" sub="選手カード" right={<button className="btn btn-ghost btn-sm" onClick={() => setEdit(true)}>✏️ 編集</button>} />
       <div className="px-4">
         {/* 選手カード */}
-        <div className="card relative overflow-hidden p-0 stripes">
+        <div className="card relative overflow-hidden p-0" style={{ backgroundImage: `linear-gradient(180deg, rgba(12,28,53,0.35), rgba(12,28,53,0.85) 70%, #13294d), url(${IMG.homeHero})`, backgroundSize: "cover", backgroundPosition: "center" }}>
           <div className="absolute top-3 left-4 font-display text-[10px] tracking-[0.3em] text-lime">SHOYA&apos;S ROAD / PLAYER CARD</div>
           <div className="absolute top-3 right-4 chip chip-gold">{titleForLevel(lv.level)}</div>
           <div className="flex items-end gap-2 pt-10 px-4">
@@ -78,7 +79,7 @@ export default function PlayerPage() {
             const it = eq[s];
             return (
               <div key={s} className="rounded-xl bg-black/25 p-2 text-center">
-                <div className="text-xl">{it ? it.icon : "—"}</div>
+                <div className="h-10 flex items-center justify-center">{it ? <img src={IMG.item(it.id)} alt="" className="h-10 w-10 object-contain" /> : <span className="text-muted">—</span>}</div>
                 <div className="text-[10px] text-muted">{SLOT_LABEL[s]}</div>
                 <div className="text-[10px] font-bold truncate">{it ? it.name : "なし"}</div>
               </div>
@@ -138,7 +139,7 @@ function EditProfile({ open, onClose }: { open: boolean; onClose: () => void }) 
     const id = uid("ph");
     await putBlob(id, blob);
     updateData((d) => ({ ...d, media: [...d.media, { id, kind: "photo", mime: blob.type || f.type, size: blob.size, date: today(), tag: "memory", comment: "選手の写真", createdAt: nowISO() }] }));
-    setP({ ...p, photoId: id, avatar: { ...p.avatar, usePhoto: true } });
+    setP({ ...p, photoId: id, avatar: { ...p.avatar, usePhoto: true, style: "photo" } });
   };
 
   return (
@@ -146,7 +147,7 @@ function EditProfile({ open, onClose }: { open: boolean; onClose: () => void }) 
       <div className="flex justify-center mb-3">
         <Character avatar={p.avatar} number={p.number} equipped={equippedItems(data)} size={130} />
       </div>
-      <Field label="カードに使う"><Segmented value={p.avatar.usePhoto && p.photoId ? "photo" : "chara"} options={[{ v: "chara", label: "キャラクター" }, { v: "photo", label: "写真" }]} onChange={(v) => av({ usePhoto: v === "photo" })} /></Field>
+      <Field label="カードに使う" hint="キャラクターは、手に入れたバットやグローブが反映されます"><Segmented value={p.avatar.style || "hero"} options={[{ v: "hero" as const, label: "イラスト" }, { v: "chara" as const, label: "キャラクター" }, { v: "photo" as const, label: "写真" }]} onChange={(v) => av({ style: v, usePhoto: v === "photo" })} /></Field>
       <div className="flex items-center gap-3 mb-3">
         {photoUrl ? <img src={photoUrl} alt="" className="w-16 h-20 object-cover rounded-xl border-2 border-lime" /> : <div className="w-16 h-20 rounded-xl bg-black/25 flex items-center justify-center text-2xl">📷</div>}
         <button className="btn btn-ghost btn-sm" onClick={() => fileRef.current?.click()}>写真をえらぶ</button>

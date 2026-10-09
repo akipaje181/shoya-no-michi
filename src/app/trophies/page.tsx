@@ -9,8 +9,9 @@ import { ITEMS, SLOT_LABEL, type ItemSlot } from "@/data/items";
 import { levelFromXp, totalXp } from "@/lib/level";
 import { equipItem } from "@/lib/game";
 import { formatJa } from "@/lib/date";
+import { IMG } from "@/lib/img";
+import { MedalImage } from "@/components/Celebration";
 
-const TIER_STYLE: Record<string, string> = { bronze: "from-[#b87333] to-[#7a4a1e]", silver: "from-[#d9dde3] to-[#8d949e]", gold: "from-[#ffd75e] to-[#c9971b]", trophy: "from-[#ffe58a] to-[#e8b923]" };
 
 export default function TrophiesPage() {
   const data = useAppData();
@@ -32,9 +33,7 @@ export default function TrophiesPage() {
               const got = have.get(a.id);
               return (
                 <div key={a.id} className={`card p-3 text-center ${got ? "" : "opacity-60"}`}>
-                  <div className={`w-14 h-14 mx-auto rounded-full flex items-center justify-center text-2xl bg-gradient-to-b ${got ? TIER_STYLE[a.tier] : "from-[#2a3a5a] to-[#1a2740]"} ${got ? "shadow-[0_0_18px_rgba(255,220,100,0.35)]" : "grayscale"}`}>
-                    {got ? a.icon : "🔒"}
-                  </div>
+                  <MedalImage tier={a.tier} icon={a.icon} size={72} locked={!got} />
                   <div className="text-xs font-bold mt-2 leading-tight">{a.title}</div>
                   <div className="text-[10px] text-muted mt-1 leading-tight">{got ? formatJa(got.unlockedAt.slice(0, 10)) : a.hint}</div>
                 </div>
@@ -64,8 +63,8 @@ export default function TrophiesPage() {
                         onClick={() => updateData((d) => equipItem(d, it.id))}
                         className={`card p-3 text-left flex items-center gap-2 ${locked ? "opacity-50" : "tap"} ${inv?.equipped ? "!border-lime" : ""}`}
                       >
-                        <div className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl" style={{ background: locked ? "rgba(0,0,0,.3)" : `linear-gradient(135deg, ${it.color}, ${it.color2 || it.color})` }}>
-                          {locked ? "🔒" : it.icon}
+                        <div className="w-14 h-14 rounded-xl flex items-center justify-center shrink-0 bg-black/25">
+                          <img src={IMG.item(it.id)} alt="" className={`w-14 h-14 object-contain ${locked ? "grayscale opacity-40" : ""}`} />
                         </div>
                         <div className="min-w-0">
                           <div className="text-sm font-bold truncate">{it.name}</div>

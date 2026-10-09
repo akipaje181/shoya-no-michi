@@ -8,6 +8,7 @@ import { celebrateGain } from "@/lib/celebrate";
 import { formatJa, nowISO, today, uid } from "@/lib/date";
 import { putBlob, shrinkPhoto, validateFile } from "@/lib/media";
 import type { Goal } from "@/lib/types";
+import { IMG } from "@/lib/img";
 
 export default function RoadPage() {
   const data = useAppData();
@@ -22,11 +23,15 @@ export default function RoadPage() {
   return (
     <div>
       <PageHeader title="夢へのロードマップ" sub={`${doneCount} / ${goals.length} 達成`} right={<button className="btn btn-ghost btn-sm" onClick={() => setAdding(true)}>＋ 目標</button>} />
+      <div className="relative -mt-3 h-[300px] overflow-hidden">
+        <img src={IMG.roadBg} alt="" className="absolute inset-0 w-full h-full object-cover object-top" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0C1C35]/40 via-transparent to-[#0C1C35]" />
+        <div className="absolute inset-x-4 bottom-3 text-center">
+          <div className="text-[11px] text-lime font-bold tracking-widest drop-shadow">DREAM</div>
+          <div className="font-display text-xl mt-1 drop-shadow-[0_2px_6px_rgba(0,0,0,0.8)]">{data.profile.dreamText}</div>
+        </div>
+      </div>
       <div className="px-4">
-        <Card className="text-center">
-          <div className="text-[11px] text-lime font-bold tracking-widest">DREAM</div>
-          <div className="font-display text-xl mt-1">{data.profile.dreamText}</div>
-        </Card>
 
         {/* 道 */}
         <div className="relative mt-4 pl-10">

@@ -8,6 +8,7 @@ import { practiceDays, streak, xpOnDate } from "@/lib/game";
 import { today, formatJa, parseISODate } from "@/lib/date";
 import { DAILY_CHEERS } from "@/data/defaults";
 import { ITEMS } from "@/data/items";
+import { IMG } from "@/lib/img";
 
 export default function Home() {
   const data = useAppData();
@@ -39,7 +40,7 @@ export default function Home() {
       </div>
 
       {/* 選手カード */}
-      <Card className="mt-3 relative overflow-hidden stripes">
+      <div className="card mt-3 relative overflow-hidden p-4" style={{ backgroundImage: `linear-gradient(90deg, rgba(12,28,53,0.25), rgba(12,28,53,0.8)), url(${IMG.homeHero})`, backgroundSize: "cover", backgroundPosition: "center" }}>
         <div className="flex items-center gap-3">
           <Link href="/player" className="shrink-0 tap">
             <Avatar data={data} size={120} pose="stand" />
@@ -60,11 +61,11 @@ export default function Home() {
         </div>
         {nextItem && (
           <div className="mt-3 text-xs rounded-xl bg-black/25 px-3 py-2 flex items-center gap-2">
-            <span className="text-lg">{nextItem.icon}</span>
+            <img src={IMG.item(nextItem.id)} alt="" className="w-8 h-8 object-contain" />
             <span>Lv.<b className="text-lime">{nextItem.unlockLevel}</b> で「{nextItem.name}」をゲット！</span>
           </div>
         )}
-      </Card>
+      </div>
 
       {/* 応援メッセージ */}
       <Card className="mt-3 !bg-none !bg-blue/20 border-blue/40">

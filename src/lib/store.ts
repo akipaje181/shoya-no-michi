@@ -38,6 +38,7 @@ export function migrate(raw: Partial<AppData>): AppData {
   const d: AppData = { ...base, ...raw } as AppData;
   d.version = DATA_VERSION;
   d.profile = { ...DEFAULT_PROFILE, ...(raw.profile || {}), avatar: { ...DEFAULT_PROFILE.avatar, ...(raw.profile?.avatar || {}) } };
+  if (!d.profile.avatar.style) d.profile.avatar.style = d.profile.avatar.usePhoto && d.profile.photoId ? "photo" : "hero";
   d.settings = { ...DEFAULT_SETTINGS, ...(raw.settings || {}), xpRules: { ...DEFAULT_SETTINGS.xpRules, ...(raw.settings?.xpRules || {}) } };
   d.stats = { ...DEFAULT_STATS, ...(raw.stats || {}) };
   // 組み込みメニュー・目標が消えていたら足す（親が消したものは builtin でも復活させない: 削除は active=false で表す）

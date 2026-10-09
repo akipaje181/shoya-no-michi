@@ -7,6 +7,7 @@ import { markSeenOne } from "@/lib/game";
 import { ACH_BY_ID } from "@/data/achievements";
 import { ITEM_BY_ID, SLOT_LABEL } from "@/data/items";
 import { titleForLevel } from "@/lib/level";
+import { IMG } from "@/lib/img";
 
 type Big = { kind: "level"; level: number } | { kind: "medal"; id: string } | { kind: "item"; id: string };
 
@@ -73,14 +74,18 @@ function BigCard({ item, onNext }: { item: Big; onNext: () => void }) {
   const pieces = Array.from({ length: 36 }, (_, i) => i);
   const colors = ["#A8E66C", "#247BDE", "#FFFFFF", "#E8B923", "#4f9bf0"];
   let icon = "⭐", title = "", sub = "", desc = "";
+  let visual: React.ReactNode = null;
   if (item.kind === "level") {
     icon = "🆙"; title = "LEVEL UP!"; sub = `Lv.${item.level}  ${titleForLevel(item.level)}`; desc = "レベルが上がった！つぎのアイテムも近い。";
+    visual = <div className="font-display text-7xl text-white drop-shadow-[0_4px_0_rgba(0,0,0,0.4)]">Lv.{item.level}</div>;
   } else if (item.kind === "medal") {
     const d = ACH_BY_ID[item.id];
     icon = d?.icon || "🏅"; title = d?.tier === "trophy" ? "TROPHY GET!" : "MEDAL GET!"; sub = d?.title || ""; desc = d?.desc || "";
+    visual = <MedalImage tier={d?.tier || "bronze"} icon={icon} size={150} />;
   } else {
     const d = ITEM_BY_ID[item.id];
     icon = d?.icon || "🎁"; title = "NEW ITEM!"; sub = d?.name || ""; desc = d ? `${SLOT_LABEL[d.slot]}を手に入れた。${d.desc}` : "";
+    visual = <img src={IMG.item(item.id)} alt="" className="w-40 h-40 object-contain drop-shadow-[0_0_24px_rgba(168,230,108,0.6)]" />;
   }
   return (
     <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-6" onClick={onNext}>
@@ -91,13 +96,28 @@ function BigCard({ item, onNext }: { item: Big; onNext: () => void }) {
           style={{ left: `${(i * 37) % 100}%`, background: colors[i % colors.length], animationDelay: `${(i % 9) * 0.12}s`, animationDuration: `${1.8 + (i % 5) * 0.25}s` }}
         />
       ))}
-      <div className="card relative overflow-hidden w-full max-w-sm text-center p-8 bounce-in shine">
-        <div className="text-7xl mb-2 pop">{icon}</div>
+      <div className="card relative overflow-hidden w-full max-w-sm text-center p-6 pt-4 bounce-in">
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${IMG.celebrateBg})` }} aria-hidden />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#13294d]/40 to-[#13294d]" aria-hidden />
+        <div className="relative">
+        <div className="h-44 flex items-center justify-center mb-1 pop">{visual}</div>
         <div className="font-display text-3xl text-lime tracking-widest">{title}</div>
         <div className="font-display text-xl mt-2">{sub}</div>
         <p className="text-sm text-white/80 mt-2">{desc}</p>
         <button className="btn btn-primary w-full mt-6">OK！</button>
+        </div>
       </div>
+    </div>
+  );
+}
+
+/** メダル画像（階級ごと）に絵文字を重ねる */
+export function MedalImage({ tier, icon, size = 64, locked }: { tier: string; icon: string; size?: number; locked?: boolean }) {
+  const src = tier === "gold" || tier === "trophy" ? IMG.medal.gold : tier === "silver" ? IMG.medal.silver : IMG.medal.bronze;
+  return (
+    <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size * 1.12 }}>
+      <img src={src} alt="" className={`w-full h-full object-contain ${locked ? "grayscale opacity-40" : "drop-shadow-[0_6px_10px_rgba(0,0,0,0.45)]"}`} draggable={false} />
+      <span className="absolute" style={{ fontSize: size * 0.34, top: "58%", left: "50%", transform: "translate(-50%, -50%)" }}>{locked ? "🔒" : icon}</span>
     </div>
   );
 }
