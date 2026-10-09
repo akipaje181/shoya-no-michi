@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# 奨也の道
+.claude/launch.json
+.env
+.env.local
