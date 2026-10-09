@@ -24,7 +24,7 @@ export default function RoadPage() {
     <div>
       <PageHeader title="夢へのロードマップ" sub={`${doneCount} / ${goals.length} 達成`} right={<button className="btn btn-ghost btn-sm" onClick={() => setAdding(true)}>＋ 目標</button>} />
       <div className="relative -mt-3 h-[300px] overflow-hidden">
-        <img src={IMG.roadBg} alt="" className="absolute inset-0 w-full h-full object-cover object-top" />
+        <img src={IMG.dreamWide} alt="" className="absolute inset-0 w-full h-full object-cover object-[30%_center]" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#0C1C35]/40 via-transparent to-[#0C1C35]" />
         <div className="absolute inset-x-4 bottom-3 text-center">
           <div className="text-[11px] text-lime font-bold tracking-widest drop-shadow">DREAM</div>

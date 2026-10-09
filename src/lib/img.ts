@@ -12,7 +12,7 @@ export type HeroPose = "stand" | "ready" | "swing" | "cheer" | "run" | "throw" |
 export const IMG = {
   openingBg: img("opening-bg.webp"),
   homeHero: img("home-hero.webp"),
-  roadBg: img("road-bg.webp"),
+  dreamWide: img("dream-wide.webp"), // 夢を見上げる少年（ロードマップの上）
   celebrateBg: img("celebrate-bg.webp"),
   hero: {
     stand: img("hero-stand.webp"), ready: img("hero-ready.webp"), swing: img("hero-swing.webp"),
