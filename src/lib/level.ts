@@ -29,21 +29,25 @@ export function levelFromXp(total: number): LevelInfo {
   return { level, current: rest, need, remain: need - rest, total };
 }
 
-/** 称号の段階 1〜6（バッジ画像 rank-N に対応） */
+/** 称号（レベルで変わる）。バッジ画像 rank-N の文字と一致させる */
+export const RANKS: { level: number; title: string }[] = [
+  { level: 1, title: "新入部員" },
+  { level: 6, title: "準レギュラー" },
+  { level: 12, title: "レギュラー" },
+  { level: 20, title: "チームの主力" },
+  { level: 30, title: "最強の選手" },
+  { level: 40, title: "レジェンド" },
+  { level: 55, title: "殿堂入り選手" },
+  { level: 70, title: "プロ野球選手" },
+];
+
+/** 称号の段階 1〜8（バッジ画像 rank-N に対応） */
 export function rankForLevel(level: number): number {
-  if (level >= 40) return 6;
-  if (level >= 30) return 5;
-  if (level >= 20) return 4;
-  if (level >= 12) return 3;
-  if (level >= 6) return 2;
-  return 1;
+  let r = 1;
+  RANKS.forEach((x, i) => { if (level >= x.level) r = i + 1; });
+  return r;
 }
 
 export function titleForLevel(level: number): string {
-  if (level >= 40) return "レジェンド";
-  if (level >= 30) return "スター選手";
-  if (level >= 20) return "レギュラー";
-  if (level >= 12) return "準レギュラー";
-  if (level >= 6) return "ルーキー";
-  return "新入部員";
+  return RANKS[rankForLevel(level) - 1].title;
 }

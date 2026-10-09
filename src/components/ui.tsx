@@ -23,11 +23,23 @@ export function SectionTitle({ children, right }: { children: ReactNode; right?:
 }
 
 export function PageHeader({ title, sub, back, right, banner }: { title: string; sub?: string; back?: string; right?: ReactNode; banner?: string }) {
+  if (banner) {
+    // タイトル文字が描き込まれたバナー画像。文字は画像側にあるので h1 は読み上げ専用
+    return (
+      <header className="relative pt-[env(safe-area-inset-top,0px)] mb-3">
+        <img src={banner} alt="" className="w-full aspect-[8/3] object-cover" draggable={false} />
+        <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-[var(--navy)] to-transparent" />
+        <h1 className="sr-only">{title}</h1>
+        {back && (
+          <Link href={back} className="btn btn-sm !min-h-10 !px-3 absolute z-10 left-3 top-[calc(env(safe-area-inset-top,0px)+10px)] !bg-[#0C1C35]/85 border border-white/50 text-white shadow-lg" aria-label="もどる">←</Link>
+        )}
+        {right && <div className="absolute z-10 right-3 top-[calc(env(safe-area-inset-top,0px)+10px)]">{right}</div>}
+        {sub && <p className="relative z-10 text-xs text-white/80 px-4 pt-2">{sub}</p>}
+      </header>
+    );
+  }
   return (
-    <header
-      className="flex items-center gap-3 pt-[calc(env(safe-area-inset-top,0px)+12px)] pb-3 px-4 sticky top-0 z-20 bg-[var(--navy)]/85 backdrop-blur bg-cover bg-center"
-      style={banner ? { backgroundImage: `linear-gradient(90deg, rgba(12,28,53,0.92) 35%, rgba(12,28,53,0.55)), url(${banner})` } : undefined}
-    >
+    <header className="flex items-center gap-3 pt-[calc(env(safe-area-inset-top,0px)+12px)] pb-3 px-4 sticky top-0 z-20 bg-[var(--navy)]/85 backdrop-blur">
       {back && (
         <Link href={back} className="btn btn-ghost btn-sm !min-h-10 !px-3" aria-label="もどる">
           ←
@@ -95,7 +107,7 @@ export function Modal({ open, onClose, title, children, wide }: { open: boolean;
 export function Empty({ text = "まだ記録がありません", sub }: { text?: string; sub?: string }) {
   return (
     <div className="text-center py-6 text-muted">
-      <img src={IMG.empty} alt="" className="w-24 h-24 object-contain mx-auto mb-1 opacity-90" />
+      <img src={IMG.scene.think} alt="" className="w-28 h-28 object-cover rounded-2xl mx-auto mb-2 opacity-95" />
       <div className="font-bold">{text}</div>
       {sub && <div className="text-xs mt-1">{sub}</div>}
     </div>

@@ -51,7 +51,7 @@ export default function QuizPage() {
         <Card>
           <div className="flex items-start justify-between mb-2">
             <div className="chip chip-blue">第{idx + 1}問 / 3　{cur.tag === "fielding" ? "守備" : cur.tag === "running" ? "走塁" : cur.tag === "batting" ? "打撃" : "ルール"}</div>
-            <img src={shown !== null && shown === cur.answer ? IMG.hero.cheer : IMG.hero.think} alt="" className="w-16 h-16 object-contain -mt-2 -mr-1" />
+            <img src={shown !== null && shown === cur.answer ? IMG.scene.cheer : IMG.scene.think} alt="" className="w-16 h-16 object-cover rounded-xl -mt-1 -mr-1 border border-white/15" />
           </div>
           <div className="font-bold text-lg leading-snug">{cur.q}</div>
           <div className="flex flex-col gap-2 mt-4">

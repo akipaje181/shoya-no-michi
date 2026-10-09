@@ -90,7 +90,7 @@ export default function Home() {
         <span className="text-xs text-muted num">{menus.filter((m) => doneToday.has(m.id)).length} / {menus.length} クリア</span>
       </div>
       {restToday && menus.every((m) => !doneToday.has(m.id)) && (
-        <Card className="mb-2 text-sm flex items-center gap-3"><img src={IMG.hero.rest} alt="" className="w-16 h-16 object-contain" /><span>きょうは休養日。体を休めるのも練習のうち！</span></Card>
+        <Card className="mb-2 text-sm flex items-center gap-3"><img src={IMG.scene.rest} alt="" className="w-16 h-16 object-cover rounded-xl" /><span>きょうは休養日。体を休めるのも練習のうち！</span></Card>
       )}
       <div className="grid grid-cols-2 gap-2">
         {menus.map((m) => {

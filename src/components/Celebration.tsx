@@ -79,7 +79,7 @@ function BigCard({ item, onNext }: { item: Big; onNext: () => void }) {
     icon = "🆙"; title = "LEVEL UP!"; sub = `Lv.${item.level}  ${titleForLevel(item.level)}`; desc = "レベルが上がった！つぎのアイテムも近い。";
     visual = (
       <div className="relative flex items-center justify-center">
-        <img src={IMG.hero.cheer} alt="" className="h-44 object-contain" />
+        <img src={IMG.scene.cheer} alt="" className="h-44 w-44 object-cover rounded-3xl border-2 border-lime/70 shadow-xl" />
         <div className="absolute -bottom-1 right-0 font-display text-4xl text-lime drop-shadow-[0_3px_0_rgba(0,0,0,0.5)]">Lv.{item.level}</div>
       </div>
     );

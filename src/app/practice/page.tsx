@@ -55,10 +55,9 @@ function Practice() {
           </div>
         </Card>
         {clear === menus.length && menus.length > 0 && (
-          <div className="mt-2 card p-3 flex items-center gap-3 pop !border-lime/60">
-            <img src={IMG.allclear} alt="" className="w-16 h-16 object-contain" />
-            <div><div className="font-display text-lime text-xl">ALL CLEAR!</div><div className="text-sm">きょうのミッション全部クリア。最高！</div></div>
-            <img src={IMG.hero.cheer} alt="" className="w-20 h-20 object-contain ml-auto" />
+          <div className="mt-2 card overflow-hidden p-0 pop !border-lime/60">
+            <img src={IMG.allclearBanner} alt="全ミッションクリア！" className="w-full aspect-[16/9] object-cover" />
+            <div className="px-3 py-2 text-sm text-center">きょうのミッション全部クリア。最高！</div>
           </div>
         )}
 
@@ -95,7 +94,7 @@ function Practice() {
               pushCelebrate({ type: "text", text: "きょうは休養日。しっかり休もう！", icon: "😴" });
             }}
           >
-            <img src={IMG.hero.rest} alt="" className="w-8 h-8 object-contain" /> きょうは休養日にする
+            <img src={IMG.scene.rest} alt="" className="w-8 h-8 object-cover rounded-full" /> きょうは休養日にする
           </button>
         )}
         <p className="text-[11px] text-muted mt-3 px-1">同じミッションのXPは1日1回。追加でやった分は回数に足されます。</p>

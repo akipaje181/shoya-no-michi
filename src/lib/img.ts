@@ -22,6 +22,8 @@ export const IMG = {
   papa: img("papa.webp"),
   empty: img("empty.webp"),
   allclear: img("allclear.webp"),
+  allclearBanner: img("allclear-banner.webp"),
+  scene: { cheer: img("scene-cheer.webp"), rest: img("scene-rest.webp"), think: img("scene-think.webp") },
   banner: (name: "games" | "growth" | "album" | "quiz" | "parent") => img(`banner-${name}.webp`),
   goal: (n: number) => img(`goal-${n}.webp`),
   rank: (n: number) => img(`rank-${n}.webp`),
