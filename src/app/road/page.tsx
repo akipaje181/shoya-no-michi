@@ -55,7 +55,7 @@ export default function RoadPage() {
                         {done && <div className="text-[11px] text-lime mt-1">🏁 {formatJa(g.achievedAt!, true)} 達成</div>}
                         {g.comment && <div className="text-xs mt-1 text-white/85">💬 {g.comment}</div>}
                       </div>
-                      {g.mediaIds.length > 0 && <Thumb id={g.mediaIds[g.mediaIds.length - 1]} />}
+                      {g.mediaIds.length > 0 ? <Thumb id={g.mediaIds[g.mediaIds.length - 1]} /> : /^g[1-7]$/.test(g.id) ? <img src={IMG.goal(Number(g.id.slice(1)))} alt="" className={`w-20 h-20 rounded-xl object-cover shrink-0 ${done || current ? "" : "opacity-60 grayscale-[30%]"}`} /> : null}
                     </div>
                   </Card>
                 </div>

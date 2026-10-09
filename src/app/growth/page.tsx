@@ -4,6 +4,7 @@ import { Area, AreaChart, Bar, BarChart, CartesianGrid, Line, LineChart, Respons
 import { Card, Empty, PageHeader, Segmented } from "@/components/ui";
 import { useAppData, useHydrated } from "@/lib/store";
 import { addDays, today } from "@/lib/date";
+import { IMG } from "@/lib/img";
 
 type Range = "7" | "30" | "90" | "365";
 type Metric = "swing" | "minutes" | "days" | "catch" | "throw" | "run20" | "hits" | "steals";
@@ -71,7 +72,7 @@ export default function GrowthPage() {
 
   return (
     <div>
-      <PageHeader title="成長グラフ" sub="数字で見る、奨也の道" />
+      <PageHeader title="成長グラフ" sub="数字で見る、奨也の道" banner={IMG.banner("growth")} />
       <div className="px-4">
         <Segmented value={range} options={[{ v: "7", label: "7日" }, { v: "30", label: "30日" }, { v: "90", label: "3か月" }, { v: "365", label: "1年" }]} onChange={setRange} />
         <div className="scroll-x flex gap-2 mt-3 pb-1">

@@ -4,6 +4,7 @@ import { Card, Empty, Field, Modal, PageHeader } from "@/components/ui";
 import { useMediaUrl } from "@/components/Avatar";
 import { useAppData, updateData, useHydrated } from "@/lib/store";
 import { deleteBlob, putBlob, shrinkPhoto, validateFile } from "@/lib/media";
+import { IMG } from "@/lib/img";
 import { formatJa, nowISO, today, uid } from "@/lib/date";
 import type { MediaAsset, MediaTag } from "@/lib/types";
 
@@ -33,7 +34,7 @@ export default function AlbumPage() {
 
   return (
     <div>
-      <PageHeader title="動画アルバム" sub={`${data.media.length} 件`} right={<button className="btn btn-primary btn-sm" onClick={() => fileRef.current?.click()}>＋ 追加</button>} />
+      <PageHeader title="動画アルバム" sub={`${data.media.length} 件`} banner={IMG.banner("album")} right={<button className="btn btn-primary btn-sm" onClick={() => fileRef.current?.click()}>＋ 追加</button>} />
       <input ref={fileRef} type="file" accept="image/*,video/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) onPick(f); e.target.value = ""; }} />
       <div className="px-4">
         <div className="scroll-x flex gap-2 pb-1">

@@ -7,6 +7,7 @@ import { careerStats, deleteGame, fmtAvg, saveGame } from "@/lib/game";
 import { celebrateGain } from "@/lib/celebrate";
 import { formatJa, nowISO, today, uid } from "@/lib/date";
 import { putBlob, shrinkPhoto, validateFile } from "@/lib/media";
+import { IMG } from "@/lib/img";
 import type { GameRecord, GameResult } from "@/lib/types";
 
 export default function GamesPage() {
@@ -20,7 +21,7 @@ export default function GamesPage() {
 
   return (
     <div>
-      <PageHeader title="試合記録" sub={`通算 ${c.games} 試合`} right={<button className="btn btn-primary btn-sm" onClick={() => setAdding(true)}>＋ 試合</button>} />
+      <PageHeader title="試合記録" sub={`通算 ${c.games} 試合`} banner={IMG.banner("games")} right={<button className="btn btn-primary btn-sm" onClick={() => setAdding(true)}>＋ 試合</button>} />
       <div className="px-4">
         <Card>
           <div className="font-display text-base mb-2">📊 通算成績</div>

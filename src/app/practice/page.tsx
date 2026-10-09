@@ -2,7 +2,8 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Card, Field, Modal, NumberStepper, PageHeader } from "@/components/ui";
+import { Card, Field, MenuIcon, Modal, NumberStepper, PageHeader } from "@/components/ui";
+import { IMG } from "@/lib/img";
 import { useAppData, updateData, useHydrated } from "@/lib/store";
 import { completeMission, markRestDay, xpOnDate } from "@/lib/game";
 import { celebrateGain, pushCelebrate } from "@/lib/celebrate";
@@ -54,7 +55,11 @@ function Practice() {
           </div>
         </Card>
         {clear === menus.length && menus.length > 0 && (
-          <div className="mt-2 text-center font-display text-lime text-lg pop">🎉 ALL CLEAR! きょうも最高！</div>
+          <div className="mt-2 card p-3 flex items-center gap-3 pop !border-lime/60">
+            <img src={IMG.allclear} alt="" className="w-16 h-16 object-contain" />
+            <div><div className="font-display text-lime text-xl">ALL CLEAR!</div><div className="text-sm">きょうのミッション全部クリア。最高！</div></div>
+            <img src={IMG.hero.cheer} alt="" className="w-20 h-20 object-contain ml-auto" />
+          </div>
         )}
 
         <div className="mt-3 flex flex-col gap-2">
@@ -68,7 +73,7 @@ function Practice() {
                 className={`card p-4 text-left tap flex items-center gap-3 ${done ? "!border-lime/60" : ""}`}
                 onClick={() => (m.id === "quiz" ? router.push("/quiz") : setOpenId(m.id))}
               >
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-2xl ${done ? "bg-lime text-navy" : "bg-black/25"}`}>{done ? "✓" : m.icon}</div>
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${done ? "bg-lime/20 ring-2 ring-lime" : "bg-black/25"}`}><MenuIcon menu={m} size={48} className={done ? "opacity-80" : ""} /></div>
                 <div className="flex-1 min-w-0">
                   <div className="font-bold">{m.name}</div>
                   <div className="text-xs text-muted">
@@ -90,7 +95,7 @@ function Practice() {
               pushCelebrate({ type: "text", text: "きょうは休養日。しっかり休もう！", icon: "😴" });
             }}
           >
-            😴 きょうは休養日にする
+            <img src={IMG.hero.rest} alt="" className="w-8 h-8 object-contain" /> きょうは休養日にする
           </button>
         )}
         <p className="text-[11px] text-muted mt-3 px-1">同じミッションのXPは1日1回。追加でやった分は回数に足されます。</p>
@@ -132,7 +137,8 @@ function MissionModal({ menu, onClose }: { menu: PracticeMenu; onClose: () => vo
   };
 
   return (
-    <Modal open onClose={onClose} title={`${menu.icon} ${menu.name}`}>
+    <Modal open onClose={onClose} title={menu.name}>
+      <div className="flex justify-center -mt-2 mb-2"><MenuIcon menu={menu} size={96} /></div>
       {done && <div className="chip chip-lime mb-3">✅ きょうはクリア済み。追加の分を記録できます</div>}
       <Field label={`やった${unit === "回" ? "回数" : "時間"}`}>
         <NumberStepper value={amount} onChange={setAmount} step={unit === "回" ? 10 : 5} unit={unit} quick={unit === "回" ? [10, 50, 100] : [5, 10, 30]} />

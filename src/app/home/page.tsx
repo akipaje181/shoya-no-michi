@@ -1,9 +1,9 @@
 "use client";
 import Link from "next/link";
 import Avatar from "@/components/Avatar";
-import { Card, ProgressBar, Stat } from "@/components/ui";
+import { Card, MenuIcon, ProgressBar, RankBadge, Stat } from "@/components/ui";
 import { useAppData, useHydrated } from "@/lib/store";
-import { levelFromXp, titleForLevel, totalXp } from "@/lib/level";
+import { levelFromXp, totalXp } from "@/lib/level";
 import { practiceDays, streak, xpOnDate } from "@/lib/game";
 import { today, formatJa, parseISODate } from "@/lib/date";
 import { DAILY_CHEERS } from "@/data/defaults";
@@ -50,7 +50,7 @@ export default function Home() {
               <span className="font-display text-3xl">{data.profile.name}</span>
               {data.profile.number && <span className="font-display text-lime text-xl">#{data.profile.number}</span>}
             </div>
-            <div className="chip chip-gold mt-1">{titleForLevel(lv.level)}</div>
+            <div className="mt-1"><RankBadge level={lv.level} /></div>
             <div className="mt-3 flex items-end justify-between">
               <span className="font-display text-2xl">Lv.<span className="text-lime text-3xl">{lv.level}</span></span>
               <span className="text-xs text-muted num">{lv.current} / {lv.need} XP</span>
@@ -68,10 +68,13 @@ export default function Home() {
       </div>
 
       {/* 応援メッセージ */}
-      <Card className="mt-3 !bg-none !bg-blue/20 border-blue/40">
-        <div className="text-[11px] font-bold text-blue-2 mb-1">💬 {unreadMsg ? `${unreadMsg.from}からの応援` : "きょうの応援"}</div>
-        <div className="font-bold leading-snug">{unreadMsg ? unreadMsg.text : cheer}</div>
-        {unreadMsg && <div className="text-[10px] text-muted mt-1">{formatJa(unreadMsg.date)}</div>}
+      <Card className="mt-3 !bg-none !bg-blue/20 border-blue/40 flex items-center gap-3">
+        <img src={IMG.papa} alt="" className="w-16 h-16 object-contain shrink-0 -ml-1" draggable={false} />
+        <div className="min-w-0 flex-1">
+          <div className="text-[11px] font-bold text-blue-2 mb-1">💬 {unreadMsg ? `${unreadMsg.from}からの応援` : "きょうの応援"}</div>
+          <div className="font-bold leading-snug">{unreadMsg ? unreadMsg.text : cheer}</div>
+          {unreadMsg && <div className="text-[10px] text-muted mt-1">{formatJa(unreadMsg.date)}</div>}
+        </div>
       </Card>
 
       {/* 今日のポイント・記録 */}
@@ -87,16 +90,16 @@ export default function Home() {
         <span className="text-xs text-muted num">{menus.filter((m) => doneToday.has(m.id)).length} / {menus.length} クリア</span>
       </div>
       {restToday && menus.every((m) => !doneToday.has(m.id)) && (
-        <Card className="mb-2 text-sm text-center">😴 きょうは休養日。体を休めるのも練習のうち！</Card>
+        <Card className="mb-2 text-sm flex items-center gap-3"><img src={IMG.hero.rest} alt="" className="w-16 h-16 object-contain" /><span>きょうは休養日。体を休めるのも練習のうち！</span></Card>
       )}
       <div className="grid grid-cols-2 gap-2">
         {menus.map((m) => {
           const done = doneToday.has(m.id);
           return (
             <Link key={m.id} href={m.id === "quiz" ? "/quiz" : `/practice?menu=${m.id}`} className={`card p-3 tap flex items-center gap-2 ${done ? "opacity-70 !border-lime/60" : ""}`}>
-              <span className="text-2xl">{m.icon}</span>
+              <MenuIcon menu={m} size={38} className="shrink-0" />
               <div className="min-w-0 flex-1">
-                <div className="font-bold text-sm truncate">{m.name}</div>
+                <div className="font-bold text-[13px] leading-tight">{m.name}</div>
                 <div className="text-[11px] text-muted">{done ? "✅ クリア！" : `+${m.xp} XP`}</div>
               </div>
             </Link>

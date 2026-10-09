@@ -6,6 +6,7 @@ import { QUIZ_BY_ID, questionsForDate } from "@/data/quiz";
 import { answerQuiz } from "@/lib/game";
 import { celebrateGain, chime } from "@/lib/celebrate";
 import { formatJa, today } from "@/lib/date";
+import { IMG } from "@/lib/img";
 
 export default function QuizPage() {
   const data = useAppData();
@@ -39,7 +40,7 @@ export default function QuizPage() {
 
   return (
     <div>
-      <PageHeader title="野球クイズ" sub={`${formatJa(t)}　正解 ${correctCount} / 3`} back="/practice" />
+      <PageHeader title="野球クイズ" sub={`${formatJa(t)}　正解 ${correctCount} / 3`} back="/practice" banner={IMG.banner("quiz")} />
       <div className="px-4">
         <div className="flex gap-1 mb-3">
           {qs.map((q, i) => {
@@ -48,7 +49,10 @@ export default function QuizPage() {
           })}
         </div>
         <Card>
-          <div className="chip chip-blue mb-2">第{idx + 1}問 / 3　{cur.tag === "fielding" ? "守備" : cur.tag === "running" ? "走塁" : cur.tag === "batting" ? "打撃" : "ルール"}</div>
+          <div className="flex items-start justify-between mb-2">
+            <div className="chip chip-blue">第{idx + 1}問 / 3　{cur.tag === "fielding" ? "守備" : cur.tag === "running" ? "走塁" : cur.tag === "batting" ? "打撃" : "ルール"}</div>
+            <img src={shown !== null && shown === cur.answer ? IMG.hero.cheer : IMG.hero.think} alt="" className="w-16 h-16 object-contain -mt-2 -mr-1" />
+          </div>
           <div className="font-bold text-lg leading-snug">{cur.q}</div>
           <div className="flex flex-col gap-2 mt-4">
             {cur.choices.map((c, i) => {

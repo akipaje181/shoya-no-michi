@@ -2,7 +2,8 @@
 // パパの応援（保護者画面）。4桁 PIN で保護
 import { useRef, useState } from "react";
 import Link from "next/link";
-import { Card, Field, Modal, PageHeader, Segmented } from "@/components/ui";
+import { Card, Field, MenuIcon, Modal, PageHeader, Segmented } from "@/components/ui";
+import { IMG } from "@/lib/img";
 import { useAppData, updateData, useHydrated, replaceData, resetData, flushSave, getData } from "@/lib/store";
 import { clearBlobs } from "@/lib/media";
 import { careerStats, fmtAvg, practiceDays, streak } from "@/lib/game";
@@ -36,7 +37,7 @@ function PinGate({ onUnlock }: { onUnlock: () => void }) {
   };
   return (
     <div>
-      <PageHeader title="パパの応援" sub="保護者用" back="/home" />
+      <PageHeader title="パパの応援" sub="保護者用" back="/home" banner={IMG.banner("parent")} />
       <div className="px-4">
         <Card className="text-center">
           <div className="text-4xl mb-2">🔒</div>
@@ -59,7 +60,7 @@ function Dashboard({ onLock }: { onLock: () => void }) {
   const [tab, setTab] = useState<Tab>("cheer");
   return (
     <div>
-      <PageHeader title="パパの応援" sub="保護者用の管理画面" back="/home" right={<button className="btn btn-ghost btn-sm" onClick={onLock}>🔒 ロック</button>} />
+      <PageHeader title="パパの応援" sub="保護者用の管理画面" back="/home" banner={IMG.banner("parent")} right={<button className="btn btn-ghost btn-sm" onClick={onLock}>🔒 ロック</button>} />
       <div className="px-4">
         <div className="scroll-x flex gap-2 pb-1">
           {([["cheer", "💬 応援"], ["records", "📋 記録"], ["rewards", "🍖 ご褒美"], ["menus", "🎯 メニュー"], ["settings", "⚙️ XP設定"], ["data", "💾 データ"]] as [Tab, string][]).map(([v, l]) => (
@@ -144,7 +145,7 @@ function RecordsTab() {
         {recent.length === 0 && <Card><div className="text-center text-muted py-3">まだ記録がありません</div></Card>}
         {recent.map((r) => (
           <div key={r.id} className="card px-3 py-2 text-sm">
-            <div className="flex items-center gap-2"><span>{menuOf(r.menuId)?.icon}</span><span className="font-bold flex-1">{menuOf(r.menuId)?.name} {r.amount}{menuOf(r.menuId)?.unit === "min" ? "分" : "回"}</span><span className="text-[10px] text-muted">{formatJa(r.date)}</span></div>
+            <div className="flex items-center gap-2">{menuOf(r.menuId) ? <MenuIcon menu={menuOf(r.menuId)!} size={28} /> : <span>📝</span>}<span className="font-bold flex-1">{menuOf(r.menuId)?.name} {r.amount}{menuOf(r.menuId)?.unit === "min" ? "分" : "回"}</span><span className="text-[10px] text-muted">{formatJa(r.date)}</span></div>
             {r.memo && <div className="text-xs text-white/80 mt-1 whitespace-pre-wrap">{r.memo}</div>}
           </div>
         ))}
@@ -214,7 +215,7 @@ function MenusTab() {
       <div className="flex flex-col gap-1">
         {menus.map((m, i) => (
           <div key={m.id} className={`card px-3 py-2 flex items-center gap-2 text-sm ${m.active ? "" : "opacity-50"}`}>
-            <span className="text-xl">{m.icon}</span>
+            <MenuIcon menu={m} size={32} />
             <div className="flex-1 min-w-0"><div className="font-bold truncate">{m.name}</div><div className="text-[11px] text-muted">目安 {m.defaultTarget}{m.unit === "min" ? "分" : "回"}・{m.xp} XP</div></div>
             <button className="btn btn-ghost btn-sm !min-h-8 !px-2" onClick={() => move(m.id, -1)} disabled={i === 0}>↑</button>
             <button className="btn btn-ghost btn-sm !min-h-8 !px-2" onClick={() => move(m.id, 1)} disabled={i === menus.length - 1}>↓</button>
@@ -241,7 +242,7 @@ function MenuModalInner({ menu, onClose }: { menu: PracticeMenu | null; onClose:
   return (
     <Modal open={open} onClose={onClose} title={isNew ? "メニューを追加" : "メニューを編集"}>
       <div className="grid grid-cols-[72px_1fr] gap-2">
-        <Field label="絵文字"><input className="input text-center text-2xl" value={m.icon} onChange={(e) => setM({ ...m, icon: e.target.value })} /></Field>
+        <Field label="絵文字（追加したメニューに表示）"><input className="input text-center text-2xl" value={m.icon} onChange={(e) => setM({ ...m, icon: e.target.value })} /></Field>
         <Field label="名前"><input className="input" value={m.name} onChange={(e) => setM({ ...m, name: e.target.value })} placeholder="例：ティー打撃" /></Field>
       </div>
       <Field label="種類（育成ステータスに関係）"><select className="input" value={m.category} onChange={(e) => setM({ ...m, category: e.target.value as MenuCategory })}>{CATS.map((c) => <option key={c.v} value={c.v}>{c.label}</option>)}</select></Field>

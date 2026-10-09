@@ -5,7 +5,7 @@ import Character from "./Character";
 import type { AppData } from "@/lib/types";
 import { ITEM_BY_ID, type ItemDef } from "@/data/items";
 import { getBlob } from "@/lib/media";
-import { IMG } from "@/lib/img";
+import { IMG, type HeroPose } from "@/lib/img";
 
 export function equippedItems(d: AppData): Partial<Record<ItemDef["slot"], ItemDef>> {
   const out: Partial<Record<ItemDef["slot"], ItemDef>> = {};
@@ -36,7 +36,7 @@ export function useMediaUrl(id?: string): string | null {
   return id && loaded && loaded.id === id ? loaded.url : null;
 }
 
-export default function Avatar({ data, size = 200, pose = "stand", forceCharacter }: { data: AppData; size?: number; pose?: "stand" | "swing" | "ready"; forceCharacter?: boolean }) {
+export default function Avatar({ data, size = 200, pose = "stand", forceCharacter }: { data: AppData; size?: number; pose?: HeroPose; forceCharacter?: boolean }) {
   const style = forceCharacter ? "chara" : data.profile.avatar.style || "hero";
   const usePhoto = style === "photo" && !!data.profile.photoId;
   const url = useMediaUrl(usePhoto ? data.profile.photoId : undefined);
@@ -54,5 +54,6 @@ export default function Avatar({ data, size = 200, pose = "stand", forceCharacte
       </div>
     );
   }
-  return <Character avatar={data.profile.avatar} number={data.profile.number} equipped={equippedItems(data)} size={size} pose={pose} />;
+  const svgPose = pose === "swing" || pose === "ready" ? pose : "stand";
+  return <Character avatar={data.profile.avatar} number={data.profile.number} equipped={equippedItems(data)} size={size} pose={svgPose} />;
 }

@@ -1,6 +1,6 @@
 // 奨也の道 service worker — アプリの殻をキャッシュしてオフラインでも開けるようにする
 // 更新時は VERSION を上げる
-const VERSION = "shoya-road-v2";
+const VERSION = "shoya-road-v3";
 const scopePath = new URL(self.registration.scope).pathname; // "/" or "/shoya-no-michi/"
 const PRECACHE = [scopePath, `${scopePath}icon-192.png`, `${scopePath}manifest.webmanifest`];
 

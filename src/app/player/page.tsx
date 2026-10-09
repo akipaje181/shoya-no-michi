@@ -3,9 +3,9 @@ import { useRef, useState } from "react";
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer } from "recharts";
 import Avatar, { equippedItems, useMediaUrl } from "@/components/Avatar";
 import Character from "@/components/Character";
-import { Card, Field, Modal, PageHeader, Segmented, Stat } from "@/components/ui";
+import { Card, Field, Modal, PageHeader, RankBadge, Segmented, Stat } from "@/components/ui";
 import { useAppData, updateData, useHydrated } from "@/lib/store";
-import { levelFromXp, titleForLevel, totalXp } from "@/lib/level";
+import { levelFromXp, totalXp } from "@/lib/level";
 import { careerStats, fmtAvg, practiceDays } from "@/lib/game";
 import { putBlob, shrinkPhoto, validateFile } from "@/lib/media";
 import { nowISO, today, uid } from "@/lib/date";
@@ -39,7 +39,7 @@ export default function PlayerPage() {
         {/* 選手カード */}
         <div className="card relative overflow-hidden p-0" style={{ backgroundImage: `linear-gradient(180deg, rgba(12,28,53,0.35), rgba(12,28,53,0.85) 70%, #13294d), url(${IMG.homeHero})`, backgroundSize: "cover", backgroundPosition: "center" }}>
           <div className="absolute top-3 left-4 font-display text-[10px] tracking-[0.3em] text-lime">SHOYA&apos;S ROAD / PLAYER CARD</div>
-          <div className="absolute top-3 right-4 chip chip-gold">{titleForLevel(lv.level)}</div>
+          <div className="absolute top-2 right-3"><RankBadge level={lv.level} size={34} /></div>
           <div className="flex items-end gap-2 pt-10 px-4">
             <div className="shrink-0 -mb-2"><Avatar data={data} size={150} pose="ready" /></div>
             <div className="flex-1 pb-4 min-w-0">

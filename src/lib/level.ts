@@ -29,6 +29,16 @@ export function levelFromXp(total: number): LevelInfo {
   return { level, current: rest, need, remain: need - rest, total };
 }
 
+/** 称号の段階 1〜6（バッジ画像 rank-N に対応） */
+export function rankForLevel(level: number): number {
+  if (level >= 40) return 6;
+  if (level >= 30) return 5;
+  if (level >= 20) return 4;
+  if (level >= 12) return 3;
+  if (level >= 6) return 2;
+  return 1;
+}
+
 export function titleForLevel(level: number): string {
   if (level >= 40) return "レジェンド";
   if (level >= 30) return "スター選手";

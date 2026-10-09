@@ -3,6 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import Celebration from "./Celebration";
+import { IMG } from "@/lib/img";
 
 const TABS = [
   { href: "/home", icon: "🏠", label: "ホーム" },
@@ -32,7 +33,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               const active = path.startsWith(t.href);
               return (
                 <Link key={t.href} href={t.href} className={`flex flex-col items-center justify-center py-2 gap-0.5 text-[11px] font-bold ${active ? "text-lime" : "text-muted"}`}>
-                  <span className={`text-2xl leading-none ${active ? "scale-110" : ""}`}>{t.icon}</span>
+                  {t.href === "/player" ? (
+                    <img src={IMG.hero.face} alt="" className={`w-7 h-7 rounded-full object-cover object-top bg-navy-3 ${active ? "ring-2 ring-lime scale-110" : "opacity-80"}`} />
+                  ) : (
+                    <span className={`text-2xl leading-none ${active ? "scale-110" : ""}`}>{t.icon}</span>
+                  )}
                   {t.label}
                 </Link>
               );

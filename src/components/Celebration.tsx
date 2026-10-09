@@ -77,7 +77,12 @@ function BigCard({ item, onNext }: { item: Big; onNext: () => void }) {
   let visual: React.ReactNode = null;
   if (item.kind === "level") {
     icon = "🆙"; title = "LEVEL UP!"; sub = `Lv.${item.level}  ${titleForLevel(item.level)}`; desc = "レベルが上がった！つぎのアイテムも近い。";
-    visual = <div className="font-display text-7xl text-white drop-shadow-[0_4px_0_rgba(0,0,0,0.4)]">Lv.{item.level}</div>;
+    visual = (
+      <div className="relative flex items-center justify-center">
+        <img src={IMG.hero.cheer} alt="" className="h-44 object-contain" />
+        <div className="absolute -bottom-1 right-0 font-display text-4xl text-lime drop-shadow-[0_3px_0_rgba(0,0,0,0.5)]">Lv.{item.level}</div>
+      </div>
+    );
   } else if (item.kind === "medal") {
     const d = ACH_BY_ID[item.id];
     icon = d?.icon || "🏅"; title = d?.tier === "trophy" ? "TROPHY GET!" : "MEDAL GET!"; sub = d?.title || ""; desc = d?.desc || "";
@@ -113,11 +118,12 @@ function BigCard({ item, onNext }: { item: Big; onNext: () => void }) {
 
 /** メダル画像（階級ごと）に絵文字を重ねる */
 export function MedalImage({ tier, icon, size = 64, locked }: { tier: string; icon: string; size?: number; locked?: boolean }) {
-  const src = tier === "gold" || tier === "trophy" ? IMG.medal.gold : tier === "silver" ? IMG.medal.silver : IMG.medal.bronze;
+  const trophy = tier === "trophy";
+  const src = trophy ? IMG.trophy : tier === "gold" ? IMG.medal.gold : tier === "silver" ? IMG.medal.silver : IMG.medal.bronze;
   return (
     <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size * 1.12 }}>
       <img src={src} alt="" className={`w-full h-full object-contain ${locked ? "grayscale opacity-40" : "drop-shadow-[0_6px_10px_rgba(0,0,0,0.45)]"}`} draggable={false} />
-      <span className="absolute" style={{ fontSize: size * 0.34, top: "58%", left: "50%", transform: "translate(-50%, -50%)" }}>{locked ? "🔒" : icon}</span>
+      <span className="absolute" style={{ fontSize: size * (trophy ? 0.26 : 0.34), top: trophy ? "30%" : "58%", left: "50%", transform: "translate(-50%, -50%)" }}>{locked ? "🔒" : trophy ? "" : icon}</span>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Card, Empty, Modal, PageHeader, Field } from "@/components/ui";
+import { Card, Empty, MenuIcon, Modal, PageHeader, Field } from "@/components/ui";
 import { useAppData, updateData, useHydrated } from "@/lib/store";
 import { deleteRecord, editRecord } from "@/lib/game";
 import { today, toISODate, formatJa, monthLabel } from "@/lib/date";
@@ -77,7 +77,7 @@ export default function HistoryPage() {
               const m = menuOf(r.menuId);
               return (
                 <Card key={r.id} className="flex items-start gap-3" onClick={() => setEdit(r)}>
-                  <div className="text-2xl">{m?.icon || "📝"}</div>
+                  {m ? <MenuIcon menu={m} size={40} /> : <div className="text-2xl">📝</div>}
                   <div className="flex-1 min-w-0">
                     <div className="font-bold">{m?.name || r.menuId} <span className="text-lime num">{r.amount}{m?.unit === "min" ? "分" : "回"}</span></div>
                     {r.measured && (

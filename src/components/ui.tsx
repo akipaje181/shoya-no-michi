@@ -1,6 +1,9 @@
 "use client";
 import Link from "next/link";
 import { useEffect, type ReactNode } from "react";
+import { IMG } from "@/lib/img";
+import { rankForLevel, titleForLevel } from "@/lib/level";
+import type { PracticeMenu } from "@/lib/types";
 
 export function Card({ children, className = "", onClick }: { children: ReactNode; className?: string; onClick?: () => void }) {
   return (
@@ -19,9 +22,12 @@ export function SectionTitle({ children, right }: { children: ReactNode; right?:
   );
 }
 
-export function PageHeader({ title, sub, back, right }: { title: string; sub?: string; back?: string; right?: ReactNode }) {
+export function PageHeader({ title, sub, back, right, banner }: { title: string; sub?: string; back?: string; right?: ReactNode; banner?: string }) {
   return (
-    <header className="flex items-center gap-3 pt-[calc(env(safe-area-inset-top,0px)+12px)] pb-3 px-4 sticky top-0 z-20 bg-[var(--navy)]/85 backdrop-blur">
+    <header
+      className="flex items-center gap-3 pt-[calc(env(safe-area-inset-top,0px)+12px)] pb-3 px-4 sticky top-0 z-20 bg-[var(--navy)]/85 backdrop-blur bg-cover bg-center"
+      style={banner ? { backgroundImage: `linear-gradient(90deg, rgba(12,28,53,0.92) 35%, rgba(12,28,53,0.55)), url(${banner})` } : undefined}
+    >
       {back && (
         <Link href={back} className="btn btn-ghost btn-sm !min-h-10 !px-3" aria-label="もどる">
           ←
@@ -88,8 +94,8 @@ export function Modal({ open, onClose, title, children, wide }: { open: boolean;
 
 export function Empty({ text = "まだ記録がありません", sub }: { text?: string; sub?: string }) {
   return (
-    <div className="text-center py-8 text-muted">
-      <div className="text-3xl mb-2">📭</div>
+    <div className="text-center py-6 text-muted">
+      <img src={IMG.empty} alt="" className="w-24 h-24 object-contain mx-auto mb-1 opacity-90" />
       <div className="font-bold">{text}</div>
       {sub && <div className="text-xs mt-1">{sub}</div>}
     </div>
@@ -153,5 +159,22 @@ export function Segmented<T extends string>({ value, options, onChange }: { valu
         </button>
       ))}
     </div>
+  );
+}
+
+/** 練習メニューのアイコン（組み込みメニューは画像、追加したメニューは絵文字） */
+export function MenuIcon({ menu, size = 44, className = "" }: { menu: Pick<PracticeMenu, "id" | "icon">; size?: number; className?: string }) {
+  const src = IMG.menu(menu.id);
+  if (!src) return <span className={className} style={{ fontSize: size * 0.6, lineHeight: 1 }}>{menu.icon}</span>;
+  return <img src={src} alt="" className={`object-contain ${className}`} style={{ width: size, height: size }} draggable={false} />;
+}
+
+/** 称号バッジ（レベルで変わる） */
+export function RankBadge({ level, size = 28, withText = true }: { level: number; size?: number; withText?: boolean }) {
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full bg-black/30 pr-2 pl-1 py-0.5">
+      <img src={IMG.rank(rankForLevel(level))} alt="" style={{ height: size }} className="object-contain" draggable={false} />
+      {withText && <span className="text-xs font-bold text-gold">{titleForLevel(level)}</span>}
+    </span>
   );
 }
