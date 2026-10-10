@@ -7,6 +7,8 @@ import { answerQuiz } from "@/lib/game";
 import { celebrateGain, chime } from "@/lib/celebrate";
 import { formatJa, today } from "@/lib/date";
 import { IMG } from "@/lib/img";
+import Link from "next/link";
+import { QUIZ_TAG_SECTION } from "@/data/rules";
 
 export default function QuizPage() {
   const data = useAppData();
@@ -40,7 +42,7 @@ export default function QuizPage() {
 
   return (
     <div>
-      <PageHeader title="野球クイズ" sub={`${formatJa(t)}　正解 ${correctCount} / 3`} back="/practice" banner={IMG.banner("quiz")} />
+      <PageHeader title="野球クイズ" sub={`${formatJa(t)}　正解 ${correctCount} / 3`} back="/practice" banner={IMG.banner("quiz")} right={<Link href="/rules" className="btn btn-ghost btn-sm !bg-black/55 border border-white/40">📖 ルール</Link>} />
       <div className="px-4">
         <div className="flex gap-1 mb-3">
           {qs.map((q, i) => {
@@ -74,6 +76,7 @@ export default function QuizPage() {
             <div className="mt-4 rounded-xl bg-black/25 p-3 fade-in">
               <div className={`font-display text-lg ${shown === cur.answer ? "text-lime" : "text-blue-2"}`}>{shown === cur.answer ? "せいかい！" : "おしい！ 答えは " + ["A", "B", "C", "D"][cur.answer]}</div>
               <div className="text-sm mt-1 text-white/90">{cur.explain}</div>
+              <Link href={`/rules/?section=${QUIZ_TAG_SECTION[cur.tag] || "basic"}`} className="inline-block text-xs text-blue-2 font-bold mt-2 underline">📖 ルールブックでくわしく見る →</Link>
               {idx < 2 && <button className="btn btn-blue w-full mt-3" onClick={() => { setIdx(idx + 1); setPicked(null); }}>つぎの問題 →</button>}
               {idx === 2 && allDone && (
                 <div className="mt-3 text-center font-bold">

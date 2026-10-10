@@ -19,6 +19,7 @@ const sumAmount = (d: AppData, menuId: string) =>
 const practiceDays = (d: AppData) => new Set(d.records.map((r) => r.date)).size;
 const sumGames = (d: AppData, k: "hits" | "runs" | "steals" | "rbi") =>
   d.games.reduce((s, g) => s + (g[k] || 0), 0);
+const careCount = (d: AppData) => d.records.filter((r) => r.menuId.startsWith("care_")).length;
 const fieldingCount = (d: AppData) => d.records.filter((r) => r.menuId === "ground").length;
 
 export const ACHIEVEMENTS: AchievementDef[] = [
@@ -33,6 +34,9 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   { id: "days100", title: "練習100日達成", desc: "100日の積み重ね", icon: "🌟", tier: "gold", hint: "100日 練習を記録する", check: (d) => practiceDays(d) >= 100 },
   { id: "fielding10", title: "守備の基本", desc: "ゴロ捕球を10日 練習した", icon: "🧤", tier: "bronze", hint: "ゴロ捕球を10日 記録する", check: (d) => fieldingCount(d) >= 10 },
   { id: "fielding_master", title: "守備マスター", desc: "ゴロ捕球を50日 練習した", icon: "🧤", tier: "gold", hint: "ゴロ捕球を50日 記録する", check: (d) => fieldingCount(d) >= 50 },
+  { id: "care10", title: "道具を大切に", desc: "グローブやスパイクの手入れを10回", icon: "🧤", tier: "bronze", hint: "道具の手入れを10回 記録する", check: (d) => careCount(d) >= 10 },
+  { id: "care50", title: "道具の達人", desc: "手入れを50回。道具が一番の相棒", icon: "✨", tier: "silver", hint: "道具の手入れを50回 記録する", check: (d) => careCount(d) >= 50 },
+  { id: "rules10", title: "ルールブック読破", desc: "ルールブックを10項目 読んだ", icon: "📖", tier: "bronze", hint: "ルールブックで10項目「読んだ」にする", check: (d) => (d.rulesRead || []).length >= 10 },
   { id: "first_game", title: "初出場", desc: "はじめての試合を記録した", icon: "🏟️", tier: "bronze", hint: "試合を1つ記録する", check: (d) => d.games.length > 0 },
   { id: "first_hit", title: "初ヒット", desc: "試合で初めてのヒット！", icon: "💥", tier: "silver", hint: "試合で安打を記録する", check: (d) => sumGames(d, "hits") >= 1 },
   { id: "first_run", title: "初得点", desc: "ホームを踏んだ！", icon: "🏠", tier: "silver", hint: "試合で得点を記録する", check: (d) => sumGames(d, "runs") >= 1 },

@@ -12,7 +12,10 @@ export const DEFAULT_MENUS: PracticeMenu[] = [
   { id: "running", name: "走塁", icon: "🏃", category: "running", unit: "count", defaultTarget: 10, xp: 30, active: true, order: 5, builtin: true },
   { id: "stretch", name: "ストレッチ", icon: "🧘", category: "stretch", unit: "min", defaultTarget: 10, xp: 15, active: true, order: 6, builtin: true },
   { id: "quiz", name: "野球クイズ", icon: "❓", category: "quiz", unit: "count", defaultTarget: 3, xp: 20, active: true, order: 7, builtin: true },
-  { id: "free", name: "自由練習", icon: "✨", category: "free", unit: "min", defaultTarget: 20, xp: 20, active: true, order: 8, builtin: true },
+  { id: "care_glove", name: "グローブを磨く", icon: "🧤", category: "care", unit: "min", defaultTarget: 5, xp: 15, active: true, order: 8, builtin: true },
+  { id: "care_spikes", name: "スパイクを磨く", icon: "👟", category: "care", unit: "min", defaultTarget: 5, xp: 15, active: true, order: 9, builtin: true },
+  { id: "care_gear", name: "道具をそろえる", icon: "🎒", category: "care", unit: "count", defaultTarget: 1, xp: 10, active: true, order: 10, builtin: true },
+  { id: "free", name: "自由練習", icon: "✨", category: "free", unit: "min", defaultTarget: 20, xp: 20, active: true, order: 11, builtin: true },
 ];
 
 export const DEFAULT_GOALS: Goal[] = [
@@ -88,6 +91,9 @@ export const DAILY_CHEERS: string[] = [
   "いいプレーは、いい準備から。ストレッチも大事！",
   "夢は大きく、練習はコツコツ。",
   "きょうのミッション、クリアしていこう！",
+  "道具を大切にする選手は、上手くなる。グローブを磨こう！",
+  "スパイクの土を落とすと、次の練習の足が軽い。",
+  "ルールを知っている選手は、迷わず動ける。ルールブックを1つ読もう。",
 ];
 
 export function makeDefaultData(nowISO: string): AppData {
@@ -109,6 +115,7 @@ export function makeDefaultData(nowISO: string): AppData {
     rewards: [],
     restDays: [],
     events: [],
+    rulesRead: [],
     stats: DEFAULT_STATS,
     updatedAt: nowISO,
   };

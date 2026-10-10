@@ -40,6 +40,7 @@ function bumpStats(stats: GrowthStats, category: MenuCategory, amountRatio: numb
     case "running": gain("speed", 1.5); break;
     case "stretch": gain("speed", 0.3); gain("power", 0.3); break;
     case "quiz": gain("knowledge", 1.5); break;
+    case "care": gain("fielding", 0.4); gain("knowledge", 0.3); break; // 道具を大切にする＝守備の心がまえ
     case "free": gain("meet", 0.3); gain("fielding", 0.3); gain("speed", 0.3); break;
   }
   return s;

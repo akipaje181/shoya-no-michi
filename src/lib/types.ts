@@ -13,6 +13,7 @@ export type MenuCategory =
   | "running" // 走塁・ダッシュ
   | "stretch" // ストレッチ・体づくり
   | "quiz" // 野球クイズ
+  | "care" // 道具の手入れ（グローブ・スパイク・バット）
   | "free"; // 自由練習
 
 export type MenuUnit = "count" | "min";
@@ -259,6 +260,7 @@ export interface AppData {
   rewards: Reward[];
   restDays: RestDay[];
   events: ScheduleEvent[];
+  rulesRead: string[]; // ルールブックで「読んだ」にした項目 id
   stats: GrowthStats;
   updatedAt: ISOTime;
 }

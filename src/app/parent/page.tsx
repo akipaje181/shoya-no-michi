@@ -192,7 +192,7 @@ function RewardsTab() {
 }
 
 const CATS: { v: MenuCategory; label: string }[] = [
-  { v: "swing", label: "打撃" }, { v: "fielding", label: "守備" }, { v: "throwing", label: "送球" }, { v: "footwork", label: "足さばき" }, { v: "running", label: "走塁" }, { v: "stretch", label: "体づくり" }, { v: "free", label: "自由" },
+  { v: "swing", label: "打撃" }, { v: "fielding", label: "守備" }, { v: "throwing", label: "送球" }, { v: "footwork", label: "足さばき" }, { v: "running", label: "走塁" }, { v: "stretch", label: "体づくり" }, { v: "care", label: "道具の手入れ" }, { v: "free", label: "自由" },
 ];
 
 function MenusTab() {

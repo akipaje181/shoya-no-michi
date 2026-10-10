@@ -43,9 +43,14 @@ export function migrate(raw: Partial<AppData>): AppData {
   d.stats = { ...DEFAULT_STATS, ...(raw.stats || {}) };
   // 組み込みメニュー・目標が消えていたら足す（親が消したものは builtin でも復活させない: 削除は active=false で表す）
   const menuIds = new Set((d.menus || []).map((m) => m.id));
-  for (const m of DEFAULT_MENUS) if (!menuIds.has(m.id) && !raw.menus) d.menus.push(m);
+  for (const m of DEFAULT_MENUS) {
+    if (menuIds.has(m.id)) continue;
+    // 新しい組み込みメニュー（例: 道具の手入れ）は既存データにも足す。並びは末尾
+    const maxOrder = d.menus.reduce((x, y) => Math.max(x, y.order), 0);
+    d.menus.push(raw.menus ? { ...m, order: m.id === "free" ? m.order : maxOrder + 1 } : m);
+  }
   if (!raw.goals || raw.goals.length === 0) d.goals = DEFAULT_GOALS;
-  for (const k of ["records", "completions", "xp", "games", "achievements", "inventory", "media", "quiz", "messages", "rewards", "restDays", "events"] as const) {
+  for (const k of ["records", "completions", "xp", "games", "achievements", "inventory", "media", "quiz", "messages", "rewards", "restDays", "events", "rulesRead"] as const) {
     if (!Array.isArray(d[k])) (d as unknown as Record<string, unknown>)[k] = [];
   }
   return d;
