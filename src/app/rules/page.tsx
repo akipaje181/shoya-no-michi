@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Card, PageHeader, ProgressBar } from "@/components/ui";
 import { useAppData, updateData, useHydrated } from "@/lib/store";
-import { RULE_COUNT, RULE_SECTIONS } from "@/data/rules";
+import { RULE_COUNT, RULE_SECTIONS, RULE_SOURCES } from "@/data/rules";
 import { settle } from "@/lib/game";
 import { pushCelebrate } from "@/lib/celebrate";
 
@@ -21,7 +21,7 @@ function Rules() {
   const data = useAppData();
   const hydrated = useHydrated();
   const params = useSearchParams();
-  const [open, setOpen] = useState<string>(params.get("section") || "basic");
+  const [open, setOpen] = useState<string>(params.get("section") || "jsbb");
   const [q, setQ] = useState("");
   if (!hydrated) return <div className="p-6 text-muted">読み込み中…</div>;
   const read = new Set(data.rulesRead || []);
@@ -84,7 +84,13 @@ function Rules() {
           </div>
         ))}
         {query && sections.length === 0 && <Card className="mt-3"><div className="text-center text-muted py-3 text-sm">「{query}」は見つかりませんでした</div></Card>}
-        <p className="text-[11px] text-muted mt-4 px-1">大会によってルールが少し違うことがあります（イニング数・リード・投球数など）。わからないときはコーチに聞こう。</p>
+        <p className="text-[11px] text-muted mt-4 px-1">「学童野球の決まり」は全日本軟式野球連盟（全軟連）の公式サイト・通知（2026年10月時点）をもとに書いています。地域の大会では別の決まりがあることも。わからないときはコーチに聞こう。</p>
+        <details className="mt-2 px-1">
+          <summary className="text-[11px] text-blue-2 font-bold cursor-pointer">📎 出典（公式サイト）を見る</summary>
+          <ul className="text-[11px] text-muted mt-1 space-y-1 pl-4 list-disc">
+            {RULE_SOURCES.map((s2) => <li key={s2.url}><a href={s2.url} target="_blank" rel="noreferrer" className="underline break-all">{s2.label}</a></li>)}
+          </ul>
+        </details>
       </div>
     </div>
   );
