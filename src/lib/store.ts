@@ -50,7 +50,7 @@ export function migrate(raw: Partial<AppData>): AppData {
     d.menus.push(raw.menus ? { ...m, order: m.id === "free" ? m.order : maxOrder + 1 } : m);
   }
   if (!raw.goals || raw.goals.length === 0) d.goals = DEFAULT_GOALS;
-  for (const k of ["records", "completions", "xp", "games", "achievements", "inventory", "media", "quiz", "messages", "rewards", "restDays", "events", "rulesRead"] as const) {
+  for (const k of ["records", "completions", "xp", "games", "achievements", "inventory", "media", "quiz", "messages", "rewards", "restDays", "events", "rulesRead", "consults"] as const) {
     if (!Array.isArray(d[k])) (d as unknown as Record<string, unknown>)[k] = [];
   }
   return d;

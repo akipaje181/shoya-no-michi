@@ -238,6 +238,14 @@ export interface ScheduleEvent {
   createdAt: ISOTime;
 }
 
+export interface ConsultNote {
+  id: string;
+  text: string;
+  tipId?: string; // コーチのアドバイスから入れた場合
+  createdAt: ISOTime;
+  doneAt?: ISOTime; // パパと話した
+}
+
 export interface RestDay {
   date: ISODate;
 }
@@ -261,6 +269,7 @@ export interface AppData {
   restDays: RestDay[];
   events: ScheduleEvent[];
   rulesRead: string[]; // ルールブックで「読んだ」にした項目 id
+  consults: ConsultNote[]; // パパと相談すること
   stats: GrowthStats;
   updatedAt: ISOTime;
 }

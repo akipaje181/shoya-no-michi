@@ -116,6 +116,7 @@ export function makeDefaultData(nowISO: string): AppData {
     restDays: [],
     events: [],
     rulesRead: [],
+    consults: [],
     stats: DEFAULT_STATS,
     updatedAt: nowISO,
   };

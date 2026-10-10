@@ -140,6 +140,8 @@ function RecordsTab() {
         <Link href="/practice/history" className="btn btn-ghost btn-sm flex-1">📅 カレンダー</Link>
         <Link href="/album" className="btn btn-ghost btn-sm flex-1">🎬 動画</Link>
       </div>
+      <div className="font-display text-base mt-4 mb-2 px-1">🎓 奨也が「パパと相談したい」こと</div>
+      <ConsultList />
       <div className="font-display text-base mt-4 mb-2 px-1">最近の練習</div>
       <div className="flex flex-col gap-1">
         {recent.length === 0 && <Card><div className="text-center text-muted py-3">まだ記録がありません</div></Card>}
@@ -150,6 +152,25 @@ function RecordsTab() {
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+function ConsultList() {
+  const data = useAppData();
+  const list = [...(data.consults || [])].sort((a, b) => (a.doneAt ? 1 : 0) - (b.doneAt ? 1 : 0) || b.createdAt.localeCompare(a.createdAt));
+  if (list.length === 0) return <Card><div className="text-center text-muted py-3 text-sm">まだありません。「コーチのアドバイス」から奨也が入れると、ここに出ます</div></Card>;
+  return (
+    <div className="flex flex-col gap-1">
+      {list.map((c) => (
+        <div key={c.id} className={`card px-3 py-2 text-sm flex items-start gap-2 ${c.doneAt ? "opacity-60" : ""}`}>
+          <span className="flex-1 whitespace-pre-wrap">{c.text}</span>
+          <div className="flex flex-col gap-1 shrink-0">
+            {!c.doneAt && <button className="btn btn-primary btn-sm !min-h-8" onClick={() => updateData((d) => ({ ...d, consults: d.consults.map((x) => (x.id === c.id ? { ...x, doneAt: nowISO() } : x)) }))}>話した</button>}
+            <button className="btn btn-ghost btn-sm !min-h-8" onClick={() => updateData((d) => ({ ...d, consults: d.consults.filter((x) => x.id !== c.id) }))}>消す</button>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

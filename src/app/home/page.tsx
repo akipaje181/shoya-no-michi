@@ -135,9 +135,10 @@ export default function Home() {
         <Link href="/road" className="btn btn-blue btn-sm mt-3 w-full">夢へのロードマップを見る →</Link>
       </Card>
 
-      <div className="grid grid-cols-2 gap-2 mt-3">
-        <Link href="/growth" className="card p-3 tap text-center"><div className="text-2xl">📈</div><div className="text-sm font-bold">成長グラフ</div></Link>
-        <Link href="/trophies" className="card p-3 tap text-center"><div className="text-2xl">🏅</div><div className="text-sm font-bold">メダル・アイテム</div></Link>
+      <div className="grid grid-cols-3 gap-2 mt-3">
+        <Link href="/coach" className="card p-3 tap text-center"><div className="text-2xl">🎓</div><div className="text-xs font-bold">コーチの<br />アドバイス</div></Link>
+        <Link href="/growth" className="card p-3 tap text-center"><div className="text-2xl">📈</div><div className="text-xs font-bold">成長<br />グラフ</div></Link>
+        <Link href="/trophies" className="card p-3 tap text-center"><div className="text-2xl">🏅</div><div className="text-xs font-bold">メダル・<br />アイテム</div></Link>
       </div>
     </div>
   );
