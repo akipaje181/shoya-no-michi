@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 import { Card, Empty, MenuIcon, Modal, PageHeader, Field } from "@/components/ui";
 import { useAppData, updateData, useHydrated } from "@/lib/store";
 import { deleteRecord, editRecord } from "@/lib/game";
@@ -25,6 +26,7 @@ export default function HistoryPage() {
   for (const r of data.records) byDate.set(r.date, [...(byDate.get(r.date) || []), r]);
   const rest = new Set(data.restDays.map((r) => r.date));
   const games = new Set(data.games.map((g) => g.date));
+  const events = new Map(data.events.map((e) => [e.date, e.kind]));
   const selRecs = (byDate.get(sel) || []).slice().sort((a, b) => (menuOf(a.menuId)?.order || 0) - (menuOf(b.menuId)?.order || 0));
   const monthRecs = data.records.filter((r) => r.date.startsWith(`${ym.y}-${String(ym.m + 1).padStart(2, "0")}`));
   const monthDays = new Set(monthRecs.map((r) => r.date)).size;
@@ -32,7 +34,7 @@ export default function HistoryPage() {
 
   return (
     <div>
-      <PageHeader title="練習の履歴" back="/practice" />
+      <PageHeader title="練習の履歴" back="/practice" right={<Link href="/schedule" className="btn btn-ghost btn-sm">📅 予定</Link>} />
       <div className="px-4">
         <Card>
           <div className="flex items-center justify-between mb-2">
@@ -57,7 +59,7 @@ export default function HistoryPage() {
                   className={`aspect-square rounded-xl flex flex-col items-center justify-center text-sm font-bold relative ${isSel ? "bg-blue text-white" : n > 0 ? "bg-lime/20 text-lime" : rest.has(d) ? "bg-white/5 text-muted" : "bg-black/15 text-white/70"} ${isToday ? "ring-2 ring-lime" : ""}`}
                 >
                   <span className="num">{Number(d.slice(-2))}</span>
-                  <span className="text-[10px] leading-none">{games.has(d) ? "⚾" : n > 0 ? "●".repeat(Math.min(3, n)) : rest.has(d) ? "休" : ""}</span>
+                  <span className="text-[10px] leading-none">{games.has(d) ? "⚾" : n > 0 ? "●".repeat(Math.min(3, n)) : rest.has(d) ? "休" : events.has(d) ? (events.get(d) === "tournament" ? "🏆" : events.get(d) === "game" ? "⚾" : "·") : ""}</span>
                 </button>
               );
             })}

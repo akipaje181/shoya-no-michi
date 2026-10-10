@@ -108,6 +108,7 @@ export function makeDefaultData(nowISO: string): AppData {
     messages: [],
     rewards: [],
     restDays: [],
+    events: [],
     stats: DEFAULT_STATS,
     updatedAt: nowISO,
   };

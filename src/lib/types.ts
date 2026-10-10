@@ -224,6 +224,19 @@ export interface GrowthStats {
   knowledge: number;
 }
 
+export type EventKind = "practice" | "game" | "tournament" | "other";
+
+export interface ScheduleEvent {
+  id: string;
+  date: ISODate;
+  kind: EventKind;
+  title: string; // 「チーム練習」「練習試合 vs ○○」「新人戦 1回戦」など
+  time?: string; // "09:00"
+  place?: string;
+  memo?: string; // 持ち物など
+  createdAt: ISOTime;
+}
+
 export interface RestDay {
   date: ISODate;
 }
@@ -245,6 +258,7 @@ export interface AppData {
   messages: EncouragementMessage[];
   rewards: Reward[];
   restDays: RestDay[];
+  events: ScheduleEvent[];
   stats: GrowthStats;
   updatedAt: ISOTime;
 }

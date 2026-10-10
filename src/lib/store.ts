@@ -45,7 +45,7 @@ export function migrate(raw: Partial<AppData>): AppData {
   const menuIds = new Set((d.menus || []).map((m) => m.id));
   for (const m of DEFAULT_MENUS) if (!menuIds.has(m.id) && !raw.menus) d.menus.push(m);
   if (!raw.goals || raw.goals.length === 0) d.goals = DEFAULT_GOALS;
-  for (const k of ["records", "completions", "xp", "games", "achievements", "inventory", "media", "quiz", "messages", "rewards", "restDays"] as const) {
+  for (const k of ["records", "completions", "xp", "games", "achievements", "inventory", "media", "quiz", "messages", "rewards", "restDays", "events"] as const) {
     if (!Array.isArray(d[k])) (d as unknown as Record<string, unknown>)[k] = [];
   }
   return d;

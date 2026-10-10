@@ -1,5 +1,6 @@
 "use client";
-import { useRef, useState } from "react";
+import { Suspense, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Card, Empty, Field, Modal, NumberStepper, PageHeader, Segmented, Stat } from "@/components/ui";
 import { useMediaUrl } from "@/components/Avatar";
 import { useAppData, updateData, useHydrated } from "@/lib/store";
@@ -11,10 +12,20 @@ import { IMG } from "@/lib/img";
 import type { GameRecord, GameResult } from "@/lib/types";
 
 export default function GamesPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-muted">読み込み中…</div>}>
+      <Games />
+    </Suspense>
+  );
+}
+
+function Games() {
   const data = useAppData();
   const hydrated = useHydrated();
+  const params = useSearchParams();
+  const prefill = params.get("date") ? { date: params.get("date")!, opponent: (params.get("title") || "").replace(/^(練習試合|公式戦|試合)\s*(vs\.?\s*)?/i, "") } : null;
   const [edit, setEdit] = useState<GameRecord | null>(null);
-  const [adding, setAdding] = useState(false);
+  const [adding, setAdding] = useState(!!prefill);
   if (!hydrated) return <div className="p-6 text-muted">読み込み中…</div>;
   const c = careerStats(data.games);
   const games = [...data.games].sort((a, b) => b.date.localeCompare(a.date));
@@ -65,7 +76,7 @@ export default function GamesPage() {
           </div>
         )}
       </div>
-      <GameModal game={edit} open={!!edit || adding} onClose={() => { setEdit(null); setAdding(false); }} />
+      <GameModal game={edit} open={!!edit || adding} prefill={prefill} onClose={() => { setEdit(null); setAdding(false); }} />
     </div>
   );
 }
@@ -82,14 +93,14 @@ function blank(): GameRecord {
   return { id: uid("gm"), date: today(), opponent: "", result: "", pa: 0, ab: 0, hits: 0, rbi: 0, runs: 0, steals: 0, walks: 0, mediaIds: [], createdAt: nowISO(), updatedAt: nowISO() };
 }
 
-function GameModal({ game, open, onClose }: { game: GameRecord | null; open: boolean; onClose: () => void }) {
+function GameModal({ game, open, onClose, prefill }: { game: GameRecord | null; open: boolean; onClose: () => void; prefill?: { date: string; opponent: string } | null }) {
   if (!open) return null;
-  return <GameModalInner key={game?.id || "new"} game={game} onClose={onClose} />;
+  return <GameModalInner key={game?.id || "new"} game={game} onClose={onClose} prefill={prefill} />;
 }
 
-function GameModalInner({ game, onClose }: { game: GameRecord | null; onClose: () => void }) {
+function GameModalInner({ game, onClose, prefill }: { game: GameRecord | null; onClose: () => void; prefill?: { date: string; opponent: string } | null }) {
   const data = useAppData();
-  const [g, setG] = useState<GameRecord>(() => (game ? { ...game } : blank()));
+  const [g, setG] = useState<GameRecord>(() => (game ? { ...game } : { ...blank(), ...(prefill ? { date: prefill.date, opponent: prefill.opponent, tournament: prefill.opponent ? "" : undefined } : {}) }));
   const fileRef = useRef<HTMLInputElement>(null);
   const open = true;
   const set = (p: Partial<GameRecord>) => setG({ ...g, ...p });

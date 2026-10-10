@@ -8,6 +8,7 @@ import { practiceDays, streak, xpOnDate } from "@/lib/game";
 import { today, formatJa, parseISODate } from "@/lib/date";
 import { DAILY_CHEERS } from "@/data/defaults";
 import { ITEMS } from "@/data/items";
+import { upcoming, relativeLabel, KIND_ICON, KIND_LABEL } from "@/lib/schedule";
 import { IMG } from "@/lib/img";
 
 export default function Home() {
@@ -21,6 +22,7 @@ export default function Home() {
   const st = streak(data, t);
   const days = practiceDays(data);
   const dayIdx = Math.floor(parseISODate(t).getTime() / 86400000);
+  const nextEvents = upcoming(data, 14, t).slice(0, 2);
   const unreadMsg = [...data.messages].reverse().find((m) => !m.readAt) || [...data.messages].reverse()[0];
   const cheer = DAILY_CHEERS[dayIdx % DAILY_CHEERS.length];
   const nextItem = ITEMS.filter((i) => i.unlockLevel > lv.level).sort((a, b) => a.unlockLevel - b.unlockLevel)[0];
@@ -76,6 +78,24 @@ export default function Home() {
           {unreadMsg && <div className="text-[10px] text-muted mt-1">{formatJa(unreadMsg.date)}</div>}
         </div>
       </Card>
+
+      {/* 予定 */}
+      <Link href="/schedule" className="card mt-3 p-3 tap flex items-center gap-3 block">
+        <span className="text-2xl w-9 text-center">📅</span>
+        <div className="flex-1 min-w-0">
+          {nextEvents.length === 0 ? (
+            <><div className="font-bold text-sm">予定を入れる</div><div className="text-xs text-muted">チーム練習・試合・大会のスケジュール</div></>
+          ) : (
+            nextEvents.map((e) => (
+              <div key={e.id} className="flex items-baseline gap-2 min-w-0">
+                <span className={`text-xs font-bold shrink-0 ${e.date === t ? "text-lime" : "text-blue-2"}`}>{relativeLabel(e.date, t)}</span>
+                <span className="text-sm font-bold truncate">{KIND_ICON[e.kind]} {e.title}{e.time ? ` ${e.time}` : ""}</span>
+              </div>
+            ))
+          )}
+        </div>
+        <span className="text-muted">›</span>
+      </Link>
 
       {/* 今日のポイント・記録 */}
       <div className="grid grid-cols-3 gap-2 mt-3">
