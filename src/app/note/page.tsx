@@ -9,6 +9,7 @@ import { celebrateGain, pushCelebrate } from "@/lib/celebrate";
 import { addDays, formatJa, nowISO, today, uid } from "@/lib/date";
 import type { DiaryNote, Mood } from "@/lib/types";
 import { IMG } from "@/lib/img";
+import { DayMedia } from "@/components/Media";
 
 const MOODS: { v: Mood; label: string }[] = [{ v: "great", label: "😄 さいこう" }, { v: "good", label: "🙂 いい感じ" }, { v: "soso", label: "😐 ふつう" }, { v: "tough", label: "😣 きつかった" }];
 const MOOD_ICON: Record<Mood, string> = { great: "😄", good: "🙂", soso: "😐", tough: "😣" };
@@ -30,8 +31,13 @@ function Note() {
   if (!hydrated) return <div className="p-6 text-muted">読み込み中…</div>;
   const notes = data.notes || [];
   const filled = (n: DiaryNote) => !!(n.practice.trim() || n.coachWords.length || n.didWell.trim() || n.nextGoal.trim());
-  const written = notes.filter(filled).sort((a, b) => b.date.localeCompare(a.date));
+  // 写真・動画だけの日も「これまで」に出す
+  const mediaDates = new Set(data.media.map((m) => m.date));
+  const written = notes.filter((n) => filled(n) || mediaDates.has(n.date)).sort((a, b) => b.date.localeCompare(a.date));
+  for (const d of mediaDates) if (!written.some((n) => n.date === d)) written.push({ id: `md-${d}`, date: d, practice: "", coachWords: [], didWell: "", nextGoal: "", createdAt: "", updatedAt: "" });
+  written.sort((a, b) => b.date.localeCompare(a.date));
   const coachAll = written.flatMap((n) => n.coachWords.map((w) => ({ date: n.date, w })));
+  const mediaCount = (d: string) => data.media.filter((m) => m.date === d).length;
 
   return (
     <div>
@@ -50,6 +56,7 @@ function Note() {
                 <Card key={n.id} onClick={() => { setDate(n.date); setTab("write"); }}>
                   <div className="flex items-center justify-between"><b>{formatJa(n.date, true)}</b>{n.mood && <span className="text-xl">{MOOD_ICON[n.mood]}</span>}</div>
                   {n.practice && <div className="text-sm mt-1 line-clamp-2">🏃 {n.practice}</div>}
+                  {mediaCount(n.date) > 0 && <div className="text-xs mt-1 text-muted">📷🎬 写真・動画 {mediaCount(n.date)} 件</div>}
                   {n.coachWords.length > 0 && <div className="text-sm mt-1 text-lime line-clamp-2">🗣️ {n.coachWords.join(" ／ ")}</div>}
                   {n.nextGoal && <div className="text-xs mt-1 text-muted">🎯 {n.nextGoal}</div>}
                   {n.parentComment && <div className="text-xs mt-1 text-blue-2">👨 {n.parentComment}</div>}
@@ -152,6 +159,7 @@ function Editor({ date, onDate }: { date: string; onDate: (d: string) => void })
           </Field>
           <Field label="👍 できたこと"><input className="input" value={didWell} onChange={(e) => setDidWell(e.target.value)} placeholder="例：ゴロを1回もトンネルしなかった" /></Field>
           <Field label="🎯 つぎの課題"><input className="input" value={nextGoal} onChange={(e) => setNextGoal(e.target.value)} placeholder="例：送球を胸に投げる" /></Field>
+          <DayMedia date={date} />
           <Field label="きょうの気分">
             <Segmented value={mood || ("" as Mood)} options={MOODS.map((m) => ({ v: m.v, label: m.label }))} onChange={(v) => setMood(v)} />
           </Field>

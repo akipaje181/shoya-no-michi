@@ -124,7 +124,7 @@ export interface PlayerInventory {
 }
 
 export type MediaKind = "photo" | "video";
-export type MediaTag = "batting" | "fielding" | "running" | "game" | "memory" | "other";
+export type MediaTag = "practice" | "batting" | "fielding" | "running" | "game" | "memory" | "other";
 
 export interface MediaAsset {
   id: string; // IndexedDB のキー
