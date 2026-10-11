@@ -31,3 +31,46 @@ export function syncAppBadge(count: number): void {
     /* 非対応 */
   }
 }
+
+// ---- 端末の通知（iPhone はホーム画面に追加した web アプリだけ対応。iOS 16.4 以上）
+// iOS ではアイコンの数字（バッジ）も、通知の許可を取ってからでないと出ない
+
+export type NotifyStatus = "unsupported" | "not-installed" | "default" | "granted" | "denied";
+
+/** ホーム画面に追加して開いているか */
+export function isStandalone(): boolean {
+  if (typeof window === "undefined") return false;
+  const nav = navigator as Navigator & { standalone?: boolean };
+  return !!nav.standalone || window.matchMedia("(display-mode: standalone)").matches;
+}
+
+export function notifyStatus(): NotifyStatus {
+  if (typeof window === "undefined" || !("Notification" in window)) return isStandalone() ? "unsupported" : "not-installed";
+  if (!isStandalone() && /iPhone|iPad|iPod/.test(navigator.userAgent)) return "not-installed";
+  return Notification.permission as NotifyStatus;
+}
+
+/** 通知の許可をもらう（ボタンを押したときに呼ぶ。自動では出せない） */
+export async function requestNotifyPermission(): Promise<NotifyStatus> {
+  if (typeof window === "undefined" || !("Notification" in window)) return "unsupported";
+  try {
+    const p = await Notification.requestPermission();
+    return p as NotifyStatus;
+  } catch {
+    return "unsupported";
+  }
+}
+
+/** 端末の通知センターに出す（許可があるときだけ。無ければ何もしない） */
+export async function showLocalNotification(title: string, body: string, path = "/home/"): Promise<boolean> {
+  if (typeof window === "undefined" || !("Notification" in window) || Notification.permission !== "granted") return false;
+  const base = process.env.NEXT_PUBLIC_BASE_PATH || "";
+  try {
+    const reg = await navigator.serviceWorker?.ready;
+    if (!reg) return false;
+    await reg.showNotification(title, { body, icon: `${base}/icon-192.png`, badge: `${base}/icon-192.png`, tag: `shoya-${path}`, data: { url: `${base}${path}` } });
+    return true;
+  } catch {
+    return false;
+  }
+}

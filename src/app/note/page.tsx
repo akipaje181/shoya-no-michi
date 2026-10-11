@@ -10,6 +10,7 @@ import { addDays, formatJa, nowISO, today, uid } from "@/lib/date";
 import type { DiaryNote, Mood } from "@/lib/types";
 import { IMG } from "@/lib/img";
 import { DayMedia } from "@/components/Media";
+import { showLocalNotification } from "@/lib/notify";
 
 const MOODS: { v: Mood; label: string }[] = [{ v: "great", label: "😄 さいこう" }, { v: "good", label: "🙂 いい感じ" }, { v: "soso", label: "😐 ふつう" }, { v: "tough", label: "😣 きつかった" }];
 const MOOD_ICON: Record<Mood, string> = { great: "😄", good: "🙂", soso: "😐", tough: "😣" };
@@ -108,6 +109,7 @@ function Editor({ date, onDate }: { date: string; onDate: (d: string) => void })
     let r: ReturnType<typeof saveNote> | null = null;
     updateData((d) => { r = saveNote(d, note); return r.data; });
     if (r && (r as ReturnType<typeof saveNote>).xpGained > 0) celebrateGain(r, "野球ノート");
+    if (practice.trim() || finalWords.length || didWell.trim() || nextGoal.trim()) void showLocalNotification(`📓 ${data.profile.name}がノートを書きました`, `${formatJa(date)}：${practice.trim() || finalWords[0] || didWell.trim() || nextGoal.trim()}`, "/parent/");
     else pushCelebrate({ type: "text", text: "ノートを保存しました", icon: "📓" });
   };
 

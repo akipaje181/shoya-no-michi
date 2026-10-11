@@ -1,6 +1,6 @@
 // 奨也の道 service worker — アプリの殻をキャッシュしてオフラインでも開けるようにする
 // 更新時は VERSION を上げる
-const VERSION = "shoya-road-v13";
+const VERSION = "shoya-road-v14";
 const scopePath = new URL(self.registration.scope).pathname; // "/" or "/shoya-no-michi/"
 const PRECACHE = [scopePath, `${scopePath}icon-192.png`, `${scopePath}manifest.webmanifest`];
 
@@ -13,6 +13,19 @@ self.addEventListener("install", (e) => {
 self.addEventListener("activate", (e) => {
   e.waitUntil(
     caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== VERSION).map((k) => caches.delete(k)))).then(() => self.clients.claim()),
+  );
+});
+
+// 通知をタップしたらアプリを開く（開いていればそのタブへ）
+self.addEventListener("notificationclick", (e) => {
+  e.notification.close();
+  const url = (e.notification.data && e.notification.data.url) || scopePath;
+  e.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
+      const c = list.find((x) => "focus" in x);
+      if (c) return c.navigate ? c.navigate(url).then((w) => w && w.focus()) : c.focus();
+      return self.clients.openWindow(url);
+    }),
   );
 });
 

@@ -7,7 +7,7 @@ import { IMG } from "@/lib/img";
 import { useAppData, updateData, useHydrated, replaceData, resetData, flushSave, getData } from "@/lib/store";
 import { clearBlobs } from "@/lib/media";
 import { careerStats, fmtAvg, practiceDays, streak, setNoteParentComment, markNotesReadByParent } from "@/lib/game";
-import { unreadNotesForParent } from "@/lib/notify";
+import { unreadNotesForParent, notifyStatus, requestNotifyPermission, showLocalNotification, isStandalone, syncAppBadge, unreadCommentsForChild, type NotifyStatus } from "@/lib/notify";
 import { levelFromXp, totalXp } from "@/lib/level";
 import { addDays, formatJa, nowISO, today, uid } from "@/lib/date";
 import type { AppData, PracticeMenu, MenuCategory, Reward } from "@/lib/types";
@@ -192,7 +192,7 @@ function NotesTab() {
             {n.nextGoal && <div className="text-sm mt-1">🎯 {n.nextGoal}</div>}
             <div className="flex gap-2 mt-2">
               <input className="input !min-h-10" placeholder="お父さんのひとこと" value={draft[n.date] ?? n.parentComment ?? ""} onChange={(e) => setDraft({ ...draft, [n.date]: e.target.value })} />
-              <button className="btn btn-blue btn-sm shrink-0" onClick={() => { updateData((d) => setNoteParentComment(d, n.date, (draft[n.date] ?? n.parentComment ?? "").trim())); pushCelebrate({ type: "text", text: "ひとことを書きました。奨也にお知らせが出ます", icon: "👨" }); }}>保存</button>
+              <button className="btn btn-blue btn-sm shrink-0" onClick={() => { const c = (draft[n.date] ?? n.parentComment ?? "").trim(); updateData((d) => setNoteParentComment(d, n.date, c)); pushCelebrate({ type: "text", text: "ひとことを書きました。奨也にお知らせが出ます", icon: "👨" }); if (c) void showLocalNotification(`💬 ${data.settings.parentName}からひとこと`, c, `/note/?date=${n.date}`); }}>保存</button>
             </div>
             {n.parentComment && n.parentCommentAt && <div className="text-[10px] text-muted mt-1">{n.commentReadAt && n.commentReadAt >= n.parentCommentAt ? "✅ 奨也が読みました" : "📨 まだ奨也は読んでいません（ホームにお知らせが出ています）"}</div>}
           </Card>
@@ -328,6 +328,35 @@ function MenuModalInner({ menu, onClose }: { menu: PracticeMenu | null; onClose:
   );
 }
 
+function NotifyCard() {
+  const data = useAppData();
+  const [status, setStatus] = useState<NotifyStatus>(() => notifyStatus());
+  const [tested, setTested] = useState("");
+  const count = unreadNotesForParent(data).length + unreadCommentsForChild(data).length;
+  const label: Record<NotifyStatus, string> = {
+    unsupported: "この端末・ブラウザでは使えません",
+    "not-installed": "ホーム画面に追加してから、そのアイコンで開くと設定できます（Safari の 共有 → ホーム画面に追加）",
+    default: "まだ許可していません",
+    granted: "✅ オン（ホーム画面のアイコンに未読の数字が出ます）",
+    denied: "❌ 許可されていません。iPhone の 設定 → 通知 → 奨也の道 でオンにしてください",
+  };
+  const ask = async () => {
+    const s = await requestNotifyPermission();
+    setStatus(s);
+    if (s === "granted") { syncAppBadge(count); const ok = await showLocalNotification("🔔 お知らせをオンにしました", "ノートやひとことが書かれると、ここに出ます", "/home/"); setTested(ok ? "テスト通知を送りました（通知センターを見てください）" : "通知を送れませんでした"); }
+  };
+  return (
+    <Card className="mt-3">
+      <div className="font-display text-base mb-1">🔔 ホーム画面の数字と通知</div>
+      <p className="text-[11px] text-muted mb-2">奨也がノートを書いたとき／お父さんがひとことを書いたときに、端末の通知センターに出し、ホーム画面のアイコンに未読の数字を出します。iPhone は「ホーム画面に追加」したアプリだけ対応（iOS 16.4 以上）。{isStandalone() ? "いまはホーム画面のアイコンから開いています。" : "いまは Safari で開いています。"}</p>
+      <div className="text-sm mb-2">{label[status]}</div>
+      {(status === "default" || status === "denied") && <button className="btn btn-primary w-full" onClick={ask}>🔔 オンにする</button>}
+      {status === "granted" && <button className="btn btn-ghost btn-sm w-full" onClick={async () => { syncAppBadge(count); const ok = await showLocalNotification("🔔 テスト", "お知らせはこのように出ます", "/home/"); setTested(ok ? "テスト通知を送りました（通知センターを見てください）" : "通知を送れませんでした"); }}>テスト通知を送る</button>}
+      {tested && <div className="text-[11px] text-lime mt-2">{tested}</div>}
+    </Card>
+  );
+}
+
 function SettingsTab() {
   const data = useAppData();
   const r = data.settings.xpRules;
@@ -335,7 +364,8 @@ function SettingsTab() {
   const [pin, setPin] = useState("");
   return (
     <div>
-      <Card>
+      <NotifyCard />
+      <Card className="mt-3">
         <div className="font-display text-base mb-2">⚙️ XP のルール</div>
         <p className="text-[11px] text-muted mb-3">各ミッションのXPは「メニュー」タブで。ここはそれ以外。</p>
         <div className="grid grid-cols-2 gap-2">
