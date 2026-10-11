@@ -22,14 +22,19 @@ export function SectionTitle({ children, right }: { children: ReactNode; right?:
   );
 }
 
-export function PageHeader({ title, sub, back, right, banner }: { title: string; sub?: string; back?: string; right?: ReactNode; banner?: string }) {
+export function PageHeader({ title, sub, back, right, banner, bannerTitle }: { title: string; sub?: string; back?: string; right?: ReactNode; banner?: string; bannerTitle?: boolean }) {
   if (banner) {
     // タイトル文字が描き込まれたバナー画像。文字は画像側にあるので h1 は読み上げ専用
+    // bannerTitle のときは画像に文字が無いので、右側にタイトルを HTML で重ねる
     return (
       <header className="relative pt-[env(safe-area-inset-top,0px)] mb-3">
         <img src={banner} alt="" className="w-full aspect-[8/3] object-cover" draggable={false} />
         <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-[var(--navy)] to-transparent" />
-        <h1 className="sr-only">{title}</h1>
+        {bannerTitle ? (
+          <h1 className="absolute right-4 top-[calc(env(safe-area-inset-top,0px)+44%)] -translate-y-1/2 font-display text-[28px] leading-none text-white drop-shadow-[0_3px_0_rgba(12,28,53,0.9)] [text-shadow:0_0_14px_rgba(36,123,222,0.9)]">{title}</h1>
+        ) : (
+          <h1 className="sr-only">{title}</h1>
+        )}
         {back && (
           <Link href={back} className="btn btn-sm !min-h-10 !px-3 absolute z-10 left-3 top-[calc(env(safe-area-inset-top,0px)+10px)] !bg-[#0C1C35]/85 border border-white/50 text-white shadow-lg" aria-label="もどる">←</Link>
         )}

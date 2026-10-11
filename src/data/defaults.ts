@@ -64,7 +64,7 @@ export const DEFAULT_SETTINGS: Settings = {
     note: 15,
   },
   sound: false,
-  parentName: "パパ",
+  parentName: "お父さん",
 };
 
 export const DEFAULT_STATS: GrowthStats = {
@@ -76,7 +76,7 @@ export const DEFAULT_STATS: GrowthStats = {
   knowledge: 5,
 };
 
-// 応援メッセージが無い日に出す定型（パパからの応援は messages が優先）
+// 応援メッセージが無い日に出す定型（お父さんからの応援は messages が優先）
 export const DAILY_CHEERS: string[] = [
   "きょうも一歩。奨也の道は続いている！",
   "素振り1回が、いつかのヒットになる。",

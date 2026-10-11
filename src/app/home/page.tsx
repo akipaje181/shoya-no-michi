@@ -10,6 +10,7 @@ import { DAILY_CHEERS } from "@/data/defaults";
 import { ITEMS } from "@/data/items";
 import { upcoming, relativeLabel, KIND_ICON, KIND_LABEL } from "@/lib/schedule";
 import { IMG } from "@/lib/img";
+import { unreadCommentsForChild, unreadNotesForParent } from "@/lib/notify";
 
 export default function Home() {
   const data = useAppData();
@@ -29,6 +30,8 @@ export default function Home() {
   const cheer = DAILY_CHEERS[dayIdx % DAILY_CHEERS.length];
   const nextItem = ITEMS.filter((i) => i.unlockLevel > lv.level).sort((a, b) => a.unlockLevel - b.unlockLevel)[0];
   const restToday = data.restDays.some((r) => r.date === t);
+  const parentUnread = unreadNotesForParent(data).length;
+  const newComments = unreadCommentsForChild(data);
 
   if (!hydrated) return <div className="p-6 text-muted">読み込み中…</div>;
 
@@ -40,7 +43,7 @@ export default function Home() {
           <div className="font-display text-lime text-[10px] tracking-[0.3em]">SHOYA&apos;S ROAD</div>
           <div className="font-display text-xl">{formatJa(t)}</div>
         </div>
-        <Link href="/parent" className="chip chip-blue">👨 {data.settings.parentName}</Link>
+        <Link href="/parent" className="chip chip-blue relative">👨 {data.settings.parentName}{parentUnread > 0 && <span className="badge-dot">{parentUnread}</span>}</Link>
       </div>
 
       {/* 選手カード */}
@@ -80,6 +83,21 @@ export default function Home() {
           {unreadMsg && <div className="text-[10px] text-muted mt-1">{formatJa(unreadMsg.date)}</div>}
         </div>
       </Card>
+
+      {/* お父さんのひとこと（未読） */}
+      {newComments.length > 0 && (
+        <Card className="mt-3 !bg-none !bg-blue/25 border-lime/60">
+          <div className="text-[11px] font-bold text-lime mb-1">💬 お知らせ：{data.settings.parentName}からひとことが届いたよ</div>
+          {newComments.slice(0, 2).map((n) => (
+            <Link key={n.id} href={`/note/?date=${n.date}`} className="flex items-center gap-2 tap py-1">
+              <img src={IMG.papa} alt="" className="w-8 h-8 object-contain shrink-0" />
+              <span className="flex-1 min-w-0 text-sm"><b>「{n.parentComment}」</b><span className="text-[10px] text-muted ml-1">{formatJa(n.date)}のノート</span></span>
+              <span className="text-muted">›</span>
+            </Link>
+          ))}
+          {newComments.length > 2 && <div className="text-[10px] text-muted mt-1">ほか {newComments.length - 2} 件</div>}
+        </Card>
+      )}
 
       {/* 野球ノート */}
       <Link href="/note" className="card mt-3 p-3 tap flex items-center gap-3 block">

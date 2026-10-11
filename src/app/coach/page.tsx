@@ -1,5 +1,5 @@
 "use client";
-// コーチのアドバイス：記録から選ぶ「きょうの3つ」＋スキル別の一覧＋パパと相談するリスト
+// コーチのアドバイス：記録から選ぶ「きょうの3つ」＋スキル別の一覧＋お父さんと相談するリスト
 import { useState } from "react";
 import Link from "next/link";
 import { Card, PageHeader } from "@/components/ui";
@@ -27,16 +27,16 @@ export default function CoachPage() {
     if (!txt) return;
     if (tipId && (data.consults || []).some((c) => c.tipId === tipId && !c.doneAt)) { pushCelebrate({ type: "text", text: "もう相談リストに入っています", icon: "👨" }); return; }
     updateData((d) => ({ ...d, consults: [...(d.consults || []), { id: uid("cs"), text: txt, tipId, createdAt: nowISO() }] }));
-    pushCelebrate({ type: "text", text: "パパと相談するリストに入れました", icon: "👨" });
+    pushCelebrate({ type: "text", text: "お父さんと相談するリストに入れました", icon: "👨" });
   };
 
   return (
     <div>
-      <PageHeader title="コーチのアドバイス" sub="プロ野球コーチの目線で。最後はパパと相談" back="/home" />
+      <PageHeader title="コーチのアドバイス" sub="プロ野球コーチの目線で。最後はお父さんと相談" back="/home" />
       <div className="px-4">
         <Card className="flex items-center gap-3 !bg-none !bg-blue/15 border-blue/40">
           <img src={IMG.hero.think} alt="" className="w-14 h-14 object-contain shrink-0" />
-          <p className="text-xs text-white/85 leading-relaxed">ここに書いてあるのは、プロ野球のコーチが大事にしている考え方をもとにした<b>目安</b>。体や作戦のことは人によってちがうから、<b>最後はパパ・監督・コーチと相談して決めよう</b>。</p>
+          <p className="text-xs text-white/85 leading-relaxed">ここに書いてあるのは、プロ野球のコーチが大事にしている考え方をもとにした<b>目安</b>。体や作戦のことは人によってちがうから、<b>最後はお父さん・監督・コーチと相談して決めよう</b>。</p>
         </Card>
 
         <div className="font-display text-lg mt-5 mb-2 px-1">🎓 きょうのアドバイス <span className="text-xs text-muted font-sans">{formatJa(new Date().toISOString().slice(0, 10))}</span></div>
@@ -52,14 +52,14 @@ export default function CoachPage() {
           {TIPS.filter((t) => t.cat === cat).map((t) => <TipCard key={t.id} tip={t} collapsed onConsult={() => addConsult(`${t.title}：${t.ask}`, t.id)} />)}
         </div>
 
-        <div className="font-display text-lg mt-6 mb-2 px-1">👨 パパと相談すること {open > 0 && <span className="chip chip-gold">{open}</span>}</div>
+        <div className="font-display text-lg mt-6 mb-2 px-1">👨 お父さんと相談すること {open > 0 && <span className="chip chip-gold">{open}</span>}</div>
         <Card>
           <div className="flex gap-2">
             <input className="input" value={text} onChange={(e) => setText(e.target.value)} placeholder="自分で書く（例：バットを買いかえたい）" />
             <button className="btn btn-blue btn-sm shrink-0" disabled={!text.trim()} onClick={() => { addConsult(text); setText(""); }}>追加</button>
           </div>
           {consults.length === 0 ? (
-            <p className="text-xs text-muted mt-3">アドバイスの「👨 パパと相談する」を押すと、ここにたまる。パパの画面（パパの応援 → 記録）にも出るよ。</p>
+            <p className="text-xs text-muted mt-3">アドバイスの「👨 お父さんと相談する」を押すと、ここにたまる。お父さんの画面（お父さんの応援 → 記録）にも出るよ。</p>
           ) : (
             <ul className="mt-3 flex flex-col gap-1">
               {consults.map((c) => (
@@ -71,7 +71,7 @@ export default function CoachPage() {
               ))}
             </ul>
           )}
-          <Link href="/parent" className="btn btn-ghost btn-sm w-full mt-3">👨 パパの画面を開く</Link>
+          <Link href="/parent" className="btn btn-ghost btn-sm w-full mt-3">👨 お父さんの画面を開く</Link>
         </Card>
         <p className="text-[11px] text-muted mt-3 px-1">アドバイスは 全軟連のガイドライン（練習・投球数）とプロのコーチの一般的な考え方をもとに作っています。チームの方針と違うときは、監督・コーチの言うことを優先してね。</p>
       </div>
@@ -93,8 +93,8 @@ function TipCard({ tip, reason, collapsed, onConsult }: { tip: Tip; reason?: str
       <div className="px-4 pb-4 -mt-1">
         <p className="text-sm text-white/90 leading-relaxed">{tip.body}</p>
         <div className="mt-3 rounded-xl bg-lime/15 px-3 py-2 text-sm"><span className="text-lime font-bold">🎯 今日できる練習：</span>{tip.drill}</div>
-        <div className="mt-2 rounded-xl bg-blue/20 px-3 py-2 text-sm"><span className="text-blue-2 font-bold">👨 パパと相談：</span>{tip.ask}</div>
-        <button className="btn btn-ghost btn-sm w-full mt-3" onClick={onConsult}>👨 パパと相談するリストに入れる</button>
+        <div className="mt-2 rounded-xl bg-blue/20 px-3 py-2 text-sm"><span className="text-blue-2 font-bold">👨 お父さんと相談：</span>{tip.ask}</div>
+        <button className="btn btn-ghost btn-sm w-full mt-3" onClick={onConsult}>👨 お父さんと相談するリストに入れる</button>
       </div>
     </details>
   );

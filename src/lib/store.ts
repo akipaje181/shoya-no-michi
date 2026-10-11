@@ -41,6 +41,9 @@ export function migrate(raw: Partial<AppData>): AppData {
   if (!d.profile.avatar.style) d.profile.avatar.style = d.profile.avatar.usePhoto && d.profile.photoId ? "photo" : "hero";
   d.settings = { ...DEFAULT_SETTINGS, ...(raw.settings || {}), xpRules: { ...DEFAULT_SETTINGS.xpRules, ...(raw.settings?.xpRules || {}) } };
   d.stats = { ...DEFAULT_STATS, ...(raw.stats || {}) };
+  // v1.2: 「パパ」→「お父さん」
+  if (d.settings.parentName === "パパ") d.settings.parentName = "お父さん";
+  if (Array.isArray(raw.messages)) d.messages = raw.messages.map((m) => (m.from === "パパ" ? { ...m, from: "お父さん" } : m));
   // 組み込みメニュー・目標が消えていたら足す（親が消したものは builtin でも復活させない: 削除は active=false で表す）
   const menuIds = new Set((d.menus || []).map((m) => m.id));
   for (const m of DEFAULT_MENUS) {

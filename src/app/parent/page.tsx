@@ -1,12 +1,13 @@
 "use client";
-// パパの応援（保護者画面）。4桁 PIN で保護
-import { useRef, useState } from "react";
+// お父さんの応援（保護者画面）。4桁 PIN で保護
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Card, Field, MenuIcon, Modal, PageHeader, Segmented } from "@/components/ui";
 import { IMG } from "@/lib/img";
 import { useAppData, updateData, useHydrated, replaceData, resetData, flushSave, getData } from "@/lib/store";
 import { clearBlobs } from "@/lib/media";
-import { careerStats, fmtAvg, practiceDays, streak, setNoteParentComment } from "@/lib/game";
+import { careerStats, fmtAvg, practiceDays, streak, setNoteParentComment, markNotesReadByParent } from "@/lib/game";
+import { unreadNotesForParent } from "@/lib/notify";
 import { levelFromXp, totalXp } from "@/lib/level";
 import { addDays, formatJa, nowISO, today, uid } from "@/lib/date";
 import type { AppData, PracticeMenu, MenuCategory, Reward } from "@/lib/types";
@@ -37,8 +38,11 @@ function PinGate({ onUnlock }: { onUnlock: () => void }) {
   };
   return (
     <div>
-      <PageHeader title="パパの応援" sub="保護者用" back="/home" banner={IMG.banner("parent")} />
+      <PageHeader title="お父さんの応援" sub="保護者用" back="/home" banner={IMG.banner("parent")} bannerTitle />
       <div className="px-4">
+        {unreadNotesForParent(data).length > 0 && (
+          <div className="rounded-xl bg-lime/15 border border-lime/50 px-3 py-2 text-sm mb-3 flex items-center gap-2"><span>📓</span><span><b>{data.profile.name}</b>が新しくノートを書きました（<b className="text-lime">{unreadNotesForParent(data).length}</b> 件）。PIN を入れて「ノート」で読めます</span></div>
+        )}
         <Card className="text-center">
           <div className="text-4xl mb-2">🔒</div>
           <div className="font-bold">{setup ? "保護者用のPIN（数字4けた）を決めてください" : "PINを入れてください"}</div>
@@ -58,15 +62,23 @@ type Tab = "cheer" | "notes" | "records" | "rewards" | "menus" | "settings" | "d
 function Dashboard({ onLock }: { onLock: () => void }) {
   const data = useAppData();
   const [tab, setTab] = useState<Tab>("cheer");
+  const unread = unreadNotesForParent(data);
   return (
     <div>
-      <PageHeader title="パパの応援" sub="保護者用の管理画面" back="/home" banner={IMG.banner("parent")} right={<button className="btn btn-ghost btn-sm" onClick={onLock}>🔒 ロック</button>} />
+      <PageHeader title="お父さんの応援" sub="保護者用の管理画面" back="/home" banner={IMG.banner("parent")} bannerTitle right={<button className="btn btn-ghost btn-sm" onClick={onLock}>🔒 ロック</button>} />
       <div className="px-4">
         <div className="scroll-x flex gap-2 pb-1">
           {([["cheer", "💬 応援"], ["notes", "📓 ノート"], ["records", "📋 記録"], ["rewards", "🍖 ご褒美"], ["menus", "🎯 メニュー"], ["settings", "⚙️ XP設定"], ["data", "💾 データ"]] as [Tab, string][]).map(([v, l]) => (
-            <button key={v} className={`chip !px-3 !py-2 !text-sm shrink-0 ${tab === v ? "chip-lime" : ""}`} onClick={() => setTab(v)}>{l}</button>
+            <button key={v} className={`chip !px-3 !py-2 !text-sm shrink-0 relative ${tab === v ? "chip-lime" : ""}`} onClick={() => setTab(v)}>{l}{v === "notes" && unread.length > 0 && <span className="badge-dot">{unread.length}</span>}</button>
           ))}
         </div>
+        {tab !== "notes" && unread.length > 0 && (
+          <button className="card w-full text-left mt-3 p-3 !bg-none !bg-lime/15 border-lime/50 flex items-center gap-3 tap" onClick={() => setTab("notes")}>
+            <span className="text-2xl">📓</span>
+            <span className="flex-1 min-w-0 text-sm"><b>{data.profile.name}</b>が新しくノートを書きました（<b className="text-lime">{unread.length}</b> 件）<div className="text-xs text-muted truncate">{formatJa(unread[0].date)}：{unread[0].practice || unread[0].coachWords[0] || unread[0].didWell || unread[0].nextGoal}</div></span>
+            <span className="text-muted">›</span>
+          </button>
+        )}
         <div className="mt-3">
           {tab === "cheer" && <CheerTab />}
           {tab === "records" && <RecordsTab />}
@@ -82,7 +94,7 @@ function Dashboard({ onLock }: { onLock: () => void }) {
   );
 }
 
-const CHEER_TEMPLATES = ["きょうも練習がんばったね！", "素振りの音が良くなってきた！", "ゴロの構え、かっこよかったよ。", "次の試合、楽しみにしてる！", "失敗してもいい。挑戦したのがすごい。", "パパはいつでも応援してる。"];
+const CHEER_TEMPLATES = ["きょうも練習がんばったね！", "素振りの音が良くなってきた！", "ゴロの構え、かっこよかったよ。", "次の試合、楽しみにしてる！", "失敗してもいい。挑戦したのがすごい。", "お父さんはいつでも応援してる。"];
 
 function CheerTab() {
   const data = useAppData();
@@ -141,7 +153,7 @@ function RecordsTab() {
         <Link href="/practice/history" className="btn btn-ghost btn-sm flex-1">📅 カレンダー</Link>
         <Link href="/album" className="btn btn-ghost btn-sm flex-1">🎬 動画</Link>
       </div>
-      <div className="font-display text-base mt-4 mb-2 px-1">🎓 奨也が「パパと相談したい」こと</div>
+      <div className="font-display text-base mt-4 mb-2 px-1">🎓 奨也が「お父さんと相談したい」こと</div>
       <ConsultList />
       <div className="font-display text-base mt-4 mb-2 px-1">最近の練習</div>
       <div className="flex flex-col gap-1">
@@ -161,22 +173,28 @@ function NotesTab() {
   const data = useAppData();
   const notes = [...(data.notes || [])].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 30);
   const [draft, setDraft] = useState<Record<string, string>>({});
+  // 開いたときに未読だったものを NEW で示し、既読にする（通知が消える）
+  const [newDates] = useState<string[]>(() => unreadNotesForParent(data).map((n) => n.date));
+  useEffect(() => {
+    if (newDates.length > 0) updateData((d) => markNotesReadByParent(d, newDates));
+  }, [newDates]);
   if (notes.length === 0) return <Card><div className="text-center text-muted py-3 text-sm">まだノートがありません。奨也が「野球ノート」に書くと、ここに出ます</div></Card>;
   return (
     <div>
-      <p className="text-[11px] text-muted mb-2 px-1">奨也のノート。下の欄に「パパのひとこと」を書くと、奨也のノートに表示されます。</p>
+      <p className="text-[11px] text-muted mb-2 px-1">奨也のノート。下の欄に「お父さんのひとこと」を書くと、奨也のノートに表示され、奨也にお知らせが出ます。</p>
       <div className="flex flex-col gap-2">
         {notes.map((n) => (
-          <Card key={n.id}>
-            <div className="flex items-center justify-between"><b>{formatJa(n.date)}</b>{n.mood && <span>{MOOD_ICON[n.mood]}</span>}</div>
+          <Card key={n.id} className={newDates.includes(n.date) ? "border-lime/60" : ""}>
+            <div className="flex items-center justify-between"><b>{formatJa(n.date)}{newDates.includes(n.date) && <span className="chip chip-lime !text-[10px] ml-2">NEW</span>}</b>{n.mood && <span>{MOOD_ICON[n.mood]}</span>}</div>
             {n.practice && <div className="text-sm mt-1 whitespace-pre-wrap">🏃 {n.practice}</div>}
             {n.coachWords.length > 0 && <ul className="text-sm mt-1 pl-4 list-disc">{n.coachWords.map((w, i) => <li key={i}>🗣️ {w}</li>)}</ul>}
             {n.didWell && <div className="text-sm mt-1">👍 {n.didWell}</div>}
             {n.nextGoal && <div className="text-sm mt-1">🎯 {n.nextGoal}</div>}
             <div className="flex gap-2 mt-2">
-              <input className="input !min-h-10" placeholder="パパのひとこと" value={draft[n.date] ?? n.parentComment ?? ""} onChange={(e) => setDraft({ ...draft, [n.date]: e.target.value })} />
-              <button className="btn btn-blue btn-sm shrink-0" onClick={() => { updateData((d) => setNoteParentComment(d, n.date, (draft[n.date] ?? n.parentComment ?? "").trim())); pushCelebrate({ type: "text", text: "ひとことを書きました", icon: "👨" }); }}>保存</button>
+              <input className="input !min-h-10" placeholder="お父さんのひとこと" value={draft[n.date] ?? n.parentComment ?? ""} onChange={(e) => setDraft({ ...draft, [n.date]: e.target.value })} />
+              <button className="btn btn-blue btn-sm shrink-0" onClick={() => { updateData((d) => setNoteParentComment(d, n.date, (draft[n.date] ?? n.parentComment ?? "").trim())); pushCelebrate({ type: "text", text: "ひとことを書きました。奨也にお知らせが出ます", icon: "👨" }); }}>保存</button>
             </div>
+            {n.parentComment && n.parentCommentAt && <div className="text-[10px] text-muted mt-1">{n.commentReadAt && n.commentReadAt >= n.parentCommentAt ? "✅ 奨也が読みました" : "📨 まだ奨也は読んでいません（ホームにお知らせが出ています）"}</div>}
           </Card>
         ))}
       </div>
@@ -332,7 +350,7 @@ function SettingsTab() {
       </Card>
       <Card className="mt-3">
         <div className="font-display text-base mb-2">👨 保護者の表示名</div>
-        <input className="input" value={data.settings.parentName} onChange={(e) => updateData((d) => ({ ...d, settings: { ...d.settings, parentName: e.target.value || "パパ" } }))} />
+        <input className="input" value={data.settings.parentName} onChange={(e) => updateData((d) => ({ ...d, settings: { ...d.settings, parentName: e.target.value || "お父さん" } }))} />
       </Card>
       <Card className="mt-3">
         <div className="font-display text-base mb-2">🔑 PIN を変える</div>

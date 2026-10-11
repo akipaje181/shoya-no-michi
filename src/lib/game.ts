@@ -219,7 +219,9 @@ export function deleteGame(d: AppData, id: string): AppData {
 export function saveNote(d: AppData, note: DiaryNote): GainResult {
   const levelBefore = levelFromXp(totalXp(d)).level;
   const existing = d.notes.find((n) => n.date === note.date);
-  const merged: DiaryNote = existing ? { ...existing, ...note, id: existing.id, parentComment: note.parentComment ?? existing.parentComment, updatedAt: nowISO() } : note;
+  const merged: DiaryNote = existing
+    ? { ...existing, ...note, id: existing.id, parentComment: note.parentComment ?? existing.parentComment, parentCommentAt: existing.parentCommentAt, commentReadAt: existing.commentReadAt, parentReadAt: existing.parentReadAt, updatedAt: nowISO() }
+    : note;
   let next: AppData = { ...d, notes: existing ? d.notes.map((n) => (n.id === existing.id ? merged : n)) : [...d.notes, merged] };
   const hasContent = !!(merged.practice.trim() || merged.coachWords.length || merged.didWell.trim() || merged.nextGoal.trim());
   let xpGained = 0;
@@ -231,10 +233,30 @@ export function saveNote(d: AppData, note: DiaryNote): GainResult {
   return { data: s.data, xpGained, levelBefore, levelAfter: levelFromXp(totalXp(s.data)).level, newAchievements: s.newAchievements, newItems: s.newItems };
 }
 
+/** お父さんのひとことを書く。updatedAt は変えない（奨也の記入とは別に、parentCommentAt で奨也に通知する） */
 export function setNoteParentComment(d: AppData, date: string, comment: string): AppData {
+  const now = nowISO();
   const existing = d.notes.find((n) => n.date === date);
-  if (existing) return { ...d, notes: d.notes.map((n) => (n.date === date ? { ...n, parentComment: comment, updatedAt: nowISO() } : n)) };
-  return { ...d, notes: [...d.notes, { id: uid("nt"), date, practice: "", coachWords: [], didWell: "", nextGoal: "", parentComment: comment, createdAt: nowISO(), updatedAt: nowISO() }] };
+  if (existing) {
+    const changed = (existing.parentComment || "") !== comment;
+    return { ...d, notes: d.notes.map((n) => (n.date === date ? { ...n, parentComment: comment, parentCommentAt: changed && comment ? now : n.parentCommentAt, parentReadAt: now } : n)) };
+  }
+  return { ...d, notes: [...d.notes, { id: uid("nt"), date, practice: "", coachWords: [], didWell: "", nextGoal: "", parentComment: comment, parentCommentAt: comment ? now : undefined, parentReadAt: now, createdAt: now, updatedAt: now }] };
+}
+
+/** お父さんがノートを読んだ（通知を消す） */
+export function markNotesReadByParent(d: AppData, dates: string[]): AppData {
+  if (dates.length === 0) return d;
+  const now = nowISO();
+  const set = new Set(dates);
+  return { ...d, notes: d.notes.map((n) => (set.has(n.date) ? { ...n, parentReadAt: now } : n)) };
+}
+
+/** 奨也がお父さんのひとことを読んだ（通知を消す） */
+export function markCommentRead(d: AppData, date: string): AppData {
+  const n = d.notes.find((x) => x.date === date);
+  if (!n || !n.parentComment) return d;
+  return { ...d, notes: d.notes.map((x) => (x.date === date ? { ...x, commentReadAt: nowISO() } : x)) };
 }
 
 export function achieveGoal(d: AppData, goalId: string, date = today(), comment?: string): GainResult {

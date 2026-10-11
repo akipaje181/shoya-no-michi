@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { Card, PageHeader } from "@/components/ui";
 import { useAppData, updateData, useHydrated } from "@/lib/store";
+import { unreadNotesForParent } from "@/lib/notify";
 
 // 各画面の「いつ使う・どう使う」。小4本人が読める言葉で書く
 interface Item {
@@ -18,7 +19,7 @@ const TABS: Item[] = [
   {
     href: "/home", icon: "🏠", label: "ホーム",
     when: "毎日さいしょに開く画面",
-    steps: ["今日のミッションを確認する", "レベルと XP（けいけんち）を見る", "パパからの応援メッセージを読む", "次にもらえるアイテムをチェック"],
+    steps: ["今日のミッションを確認する", "レベルと XP（けいけんち）を見る", "お父さんからの応援メッセージを読む", "次にもらえるアイテムをチェック"],
   },
   {
     href: "/practice", icon: "🎯", label: "ミッション",
@@ -75,13 +76,13 @@ const ITEMS: Item[] = [
     href: "/note", icon: "📓", label: "野球ノート",
     when: "練習や試合のあと、その日のうちに",
     steps: ["「きょう練習したこと」を書く（ミッションの記録は自動で出る）", "「コーチに言われたこと」を1つずつ追加する（あとで見返せる）", "「できたこと」「つぎの課題」を1行ずつ。保存すると XP"],
-    tips: ["「コーチの言葉」タブで、これまで言われたことをまとめて読める（試合の前に見返そう）", "パパは「パパの応援 → ノート」でひとことを書ける"],
+    tips: ["「コーチの言葉」タブで、これまで言われたことをまとめて読める（試合の前に見返そう）", "保存すると、お父さんの画面に「新しいノート」のお知らせが出る", "お父さんがひとことを書くと、ホームにお知らせが出る。ノートを開くと消える"],
   },
   {
     href: "/coach", icon: "🎓", label: "コーチのアドバイス",
     when: "何を練習したらいいか迷ったとき・試合の前",
-    steps: ["「きょうのアドバイス」を読む（記録や予定を見て、コーチが3つ選ぶ）", "「今日できる練習」を1つやってみる", "気になったアドバイスは「👨 パパと相談する」で相談リストに入れる"],
-    tips: ["アドバイスはプロ野球のコーチの考え方をもとにした目安。最後はパパ・監督・コーチと相談して決める", "相談リストは「パパの応援 → 記録」にも出る"],
+    steps: ["「きょうのアドバイス」を読む（記録や予定を見て、コーチが3つ選ぶ）", "「今日できる練習」を1つやってみる", "気になったアドバイスは「👨 お父さんと相談する」で相談リストに入れる"],
+    tips: ["アドバイスはプロ野球のコーチの考え方をもとにした目安。最後はお父さん・監督・コーチと相談して決める", "相談リストは「お父さんの応援 → 記録」にも出る"],
   },
   {
     href: "/rules", icon: "📖", label: "ルールブック",
@@ -102,12 +103,18 @@ const ITEMS: Item[] = [
     tips: ["● は練習した日、⚾ は試合の日、休 は休養日"],
   },
   {
-    href: "/parent", icon: "👨", label: "パパの応援（保護者用）", parent: true,
-    when: "パパが使う画面。4けたの PIN で開く",
-    steps: ["💬 応援：メッセージを送る（ホームに表示される）", "📋 記録：練習の記録を確認する", "🍖 ご褒美：焼肉などの約束を登録・達成にする", "🎯 メニュー：練習メニューの目安・XP を変える、メニューを足す", "⚙️ XP設定：クイズや週間目標の XP、PIN を変える", "💾 データ：バックアップの書き出し・読み込み"],
-    tips: ["記録はこの端末の中だけ。ときどき「書き出す」でバックアップを"],
+    href: "/parent", icon: "👨", label: "お父さんの応援（保護者用）", parent: true,
+    when: "お父さんが使う画面。4けたの PIN で開く",
+    steps: ["💬 応援：メッセージを送る（ホームに表示される）", "📓 ノート：奨也のノートを読んで「ひとこと」を書く（新しいノートは NEW と件数で分かる）", "📋 記録：練習の記録を確認する", "🍖 ご褒美：焼肉などの約束を登録・達成にする", "🎯 メニュー：練習メニューの目安・XP を変える、メニューを足す", "⚙️ XP設定：クイズや週間目標の XP、PIN を変える", "💾 データ：バックアップの書き出し・読み込み"],
+    tips: ["記録はこの端末の中だけ。ときどき「書き出す」でバックアップを", "お知らせは同じ端末の中で出る（ホームの「👨 お父さん」の数字、ホーム画面に追加したアプリのアイコンの数字）。別の端末に通知を送る仕組みは準備中"],
   },
 ];
+
+function ParentBadge() {
+  const data = useAppData();
+  const n = unreadNotesForParent(data).length;
+  return n > 0 ? <span className="chip chip-lime !text-[10px]">📓 新しいノート {n}</span> : null;
+}
 
 function Guide({ item }: { item: Item }) {
   return (
@@ -118,6 +125,7 @@ function Guide({ item }: { item: Item }) {
           <div className="font-bold flex items-center gap-2">
             {item.label}
             {item.parent && <span className="chip chip-gold !text-[10px]">保護者</span>}
+            {item.parent && <ParentBadge />}
           </div>
           <div className="text-xs text-muted">{item.when}</div>
         </div>
@@ -187,10 +195,10 @@ export default function MorePage() {
         <Card>
           <ul className="text-sm text-white/90 space-y-1.5 pl-5 list-disc">
             <li><b>記録はどこに？</b> この iPhone / iPad の中だけ。ネットには送られない</li>
-            <li><b>別の端末でも見たい</b> パパの応援 → 💾 データ → 「書き出す」→ もう一方で「読み込む」</li>
+            <li><b>別の端末でも見たい</b> お父さんの応援 → 💾 データ → 「書き出す」→ もう一方で「読み込む」</li>
             <li><b>画面が古いまま</b> アプリを一度閉じて、開き直す</li>
             <li><b>ホーム画面に置きたい</b> Safari の共有ボタン → 「ホーム画面に追加」</li>
-            <li><b>PIN を忘れた</b> バックアップがあれば「読み込む」で戻せる。なければパパに相談</li>
+            <li><b>PIN を忘れた</b> バックアップがあれば「読み込む」で戻せる。なければお父さんに相談</li>
           </ul>
           <div className="text-[11px] text-muted mt-3">奨也の道 SHOYA&apos;S ROAD v0.5</div>
         </Card>

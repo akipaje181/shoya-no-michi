@@ -150,7 +150,7 @@ export interface EncouragementMessage {
   id: string;
   date: ISODate;
   text: string;
-  from: string; // "パパ" など
+  from: string; // "お父さん" など
   readAt?: ISOTime;
   createdAt: ISOTime;
 }
@@ -213,7 +213,7 @@ export interface Settings {
   parentPin?: string; // 4桁
   sound: boolean;
   openingSeen?: boolean;
-  parentName: string; // "パパ"
+  parentName: string; // "お父さん"
 }
 
 // 育成ステータス（ゲームの値。実測ではない）
@@ -249,7 +249,10 @@ export interface DiaryNote {
   didWell: string; // できたこと
   nextGoal: string; // つぎの課題
   mood?: Mood;
-  parentComment?: string; // パパのひとこと
+  parentComment?: string; // お父さんのひとこと
+  parentCommentAt?: ISOTime; // ひとことを書いた時刻（奨也への通知に使う）
+  commentReadAt?: ISOTime; // 奨也がひとことを読んだ時刻
+  parentReadAt?: ISOTime; // お父さんがこのノートを読んだ時刻（未読なら通知）
   createdAt: ISOTime;
   updatedAt: ISOTime;
 }
@@ -259,7 +262,7 @@ export interface ConsultNote {
   text: string;
   tipId?: string; // コーチのアドバイスから入れた場合
   createdAt: ISOTime;
-  doneAt?: ISOTime; // パパと話した
+  doneAt?: ISOTime; // お父さんと話した
 }
 
 export interface RestDay {
@@ -285,7 +288,7 @@ export interface AppData {
   restDays: RestDay[];
   events: ScheduleEvent[];
   rulesRead: string[]; // ルールブックで「読んだ」にした項目 id
-  consults: ConsultNote[]; // パパと相談すること
+  consults: ConsultNote[]; // お父さんと相談すること
   notes: DiaryNote[]; // 野球ノート（1日1件）
   stats: GrowthStats;
   updatedAt: ISOTime;

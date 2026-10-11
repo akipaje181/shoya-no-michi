@@ -1,7 +1,11 @@
 "use client";
 // XP 獲得・レベルアップ・メダル・アイテムの演出。画面のどこからでも出る
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { onCelebrate, chime, type CelebrateEvent } from "@/lib/celebrate";
+import { syncAppBadge, unreadCommentsForChild, unreadNotesForParent } from "@/lib/notify";
+import { formatJa } from "@/lib/date";
 import { useAppData, updateData, useHydrated } from "@/lib/store";
 import { markSeenOne } from "@/lib/game";
 import { ACH_BY_ID } from "@/data/achievements";
@@ -9,13 +13,20 @@ import { ITEM_BY_ID, SLOT_LABEL } from "@/data/items";
 import { titleForLevel } from "@/lib/level";
 import { IMG } from "@/lib/img";
 
-type Big = { kind: "level"; level: number } | { kind: "medal"; id: string } | { kind: "item"; id: string };
+type Big = { kind: "level"; level: number } | { kind: "medal"; id: string } | { kind: "item"; id: string } | { kind: "comment"; id: string; date: string; text: string; from: string };
 
 export default function Celebration() {
   const data = useAppData();
   const hydrated = useHydrated();
   const [toasts, setToasts] = useState<{ id: number; text: string }[]>([]);
   const [queue, setQueue] = useState<Big[]>([]);
+  const [later, setLater] = useState<string[]>([]); // 「あとで」にしたひとこと（この起動の間だけ）
+  const path = usePathname() || "/";
+  const onParent = path.startsWith("/parent");
+
+  // ホーム画面アイコンのバッジ：お父さんの未読ノート＋奨也の未読ひとこと
+  const badgeCount = hydrated ? unreadNotesForParent(data).length + unreadCommentsForChild(data).length : 0;
+  useEffect(() => { syncAppBadge(badgeCount); }, [badgeCount]);
 
   useEffect(() => {
     let n = 0;
@@ -41,18 +52,21 @@ export default function Celebration() {
   const derived: Big[] = [
     ...data.achievements.filter((a) => !a.seen).map((a) => ({ kind: "medal" as const, id: a.id })),
     ...data.inventory.filter((i) => !i.seen).map((i) => ({ kind: "item" as const, id: i.itemId })),
+    // お父さんのひとこと（保護者画面を開いている間は出さない。ノートを開くと既読になる）
+    ...(onParent ? [] : unreadCommentsForChild(data).filter((n) => !later.includes(n.id)).map((n) => ({ kind: "comment" as const, id: n.id, date: n.date, text: n.parentComment || "", from: data.settings.parentName }))),
   ];
   const cur: Big | undefined = queue[0] ?? (hydrated ? derived[0] : undefined);
   const curKey = cur ? (cur.kind === "level" ? `L${cur.level}` : `${cur.kind}:${cur.id}`) : "";
   useEffect(() => {
     if (!curKey) return;
-    chime(curKey.startsWith("L") ? "level" : "medal", data.settings.sound);
+    chime(curKey.startsWith("L") ? "level" : curKey.startsWith("comment") ? "xp" : "medal", data.settings.sound);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [curKey]);
 
   const next = () => {
     if (!cur) return;
     if (cur.kind === "level") setQueue((q) => q.slice(1));
+    else if (cur.kind === "comment") setLater((l) => [...l, cur.id]);
     else updateData((d) => markSeenOne(d, cur.kind, cur.id));
   };
 
@@ -83,6 +97,9 @@ function BigCard({ item, onNext }: { item: Big; onNext: () => void }) {
         <div className="absolute -bottom-1 right-0 font-display text-4xl text-lime drop-shadow-[0_3px_0_rgba(0,0,0,0.5)]">Lv.{item.level}</div>
       </div>
     );
+  } else if (item.kind === "comment") {
+    icon = "💬"; title = "お知らせ"; sub = `${item.from}からひとこと`; desc = "";
+    visual = <img src={IMG.papa} alt="" className="w-36 h-36 object-contain drop-shadow-[0_0_24px_rgba(36,123,222,0.6)]" />;
   } else if (item.kind === "medal") {
     const d = ACH_BY_ID[item.id];
     icon = d?.icon || "🏅"; title = d?.tier === "trophy" ? "TROPHY GET!" : "MEDAL GET!"; sub = d?.title || ""; desc = d?.desc || "";
@@ -108,8 +125,19 @@ function BigCard({ item, onNext }: { item: Big; onNext: () => void }) {
         <div className="h-44 flex items-center justify-center mb-1 pop">{visual}</div>
         <div className="font-display text-3xl text-lime tracking-widest">{title}</div>
         <div className="font-display text-xl mt-2">{sub}</div>
-        <p className="text-sm text-white/80 mt-2">{desc}</p>
-        <button className="btn btn-primary w-full mt-6">OK！</button>
+        {item.kind === "comment" ? (
+          <>
+            <div className="mt-3 rounded-xl bg-blue/25 px-3 py-3 text-base font-bold leading-snug">「{item.text}」</div>
+            <div className="text-[11px] text-muted mt-1">{formatJa(item.date, true)} のノートに</div>
+            <Link href={`/note/?date=${item.date}`} className="btn btn-primary w-full mt-5" onClick={(e) => e.stopPropagation()}>📓 ノートを開いて読む</Link>
+            <button className="btn btn-ghost btn-sm w-full mt-2">あとで</button>
+          </>
+        ) : (
+          <>
+            <p className="text-sm text-white/80 mt-2">{desc}</p>
+            <button className="btn btn-primary w-full mt-6">OK！</button>
+          </>
+        )}
         </div>
       </div>
     </div>

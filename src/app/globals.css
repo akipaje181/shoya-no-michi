@@ -136,3 +136,6 @@ select.input { appearance: none; }
 .num { font-variant-numeric: tabular-nums; }
 .tap { cursor: pointer; user-select: none; -webkit-user-select: none; }
 .tap:active { transform: scale(0.97); }
+
+/* お知らせの数字（チップの右上） */
+.badge-dot { position: absolute; top: -6px; right: -6px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: #e5484d; color: #fff; font-size: 11px; font-weight: 800; line-height: 18px; text-align: center; box-shadow: 0 1px 4px rgba(0,0,0,0.5); }
