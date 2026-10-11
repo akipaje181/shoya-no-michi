@@ -61,6 +61,7 @@ export const DEFAULT_SETTINGS: Settings = {
     weeklyGoalDays: 4,
     gameRecord: 30,
     goalAchieved: 150,
+    note: 15,
   },
   sound: false,
   parentName: "パパ",
@@ -117,6 +118,7 @@ export function makeDefaultData(nowISO: string): AppData {
     events: [],
     rulesRead: [],
     consults: [],
+    notes: [],
     stats: DEFAULT_STATS,
     updatedAt: nowISO,
   };

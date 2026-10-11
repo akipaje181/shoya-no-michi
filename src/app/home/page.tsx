@@ -23,6 +23,8 @@ export default function Home() {
   const days = practiceDays(data);
   const dayIdx = Math.floor(parseISODate(t).getTime() / 86400000);
   const nextEvents = upcoming(data, 14, t).slice(0, 2);
+  const todayNote = (data.notes || []).find((n) => n.date === t && (n.practice.trim() || n.coachWords.length || n.didWell.trim() || n.nextGoal.trim()));
+  const lastCoachWord = [...(data.notes || [])].sort((a, b) => b.date.localeCompare(a.date)).flatMap((n) => n.coachWords)[0];
   const unreadMsg = [...data.messages].reverse().find((m) => !m.readAt) || [...data.messages].reverse()[0];
   const cheer = DAILY_CHEERS[dayIdx % DAILY_CHEERS.length];
   const nextItem = ITEMS.filter((i) => i.unlockLevel > lv.level).sort((a, b) => a.unlockLevel - b.unlockLevel)[0];
@@ -78,6 +80,16 @@ export default function Home() {
           {unreadMsg && <div className="text-[10px] text-muted mt-1">{formatJa(unreadMsg.date)}</div>}
         </div>
       </Card>
+
+      {/* 野球ノート */}
+      <Link href="/note" className="card mt-3 p-3 tap flex items-center gap-3 block">
+        <span className="text-2xl w-9 text-center">📓</span>
+        <div className="flex-1 min-w-0">
+          <div className="font-bold text-sm">野球ノート {todayNote ? <span className="chip chip-lime !text-[10px] ml-1">きょう 書いた</span> : <span className="chip !text-[10px] ml-1">きょうはまだ</span>}</div>
+          <div className="text-xs text-muted truncate">{lastCoachWord ? `🗣️ ${lastCoachWord}` : "練習したこと・コーチに言われたことを書こう"}</div>
+        </div>
+        <span className="text-muted">›</span>
+      </Link>
 
       {/* 予定 */}
       <Link href="/schedule" className="card mt-3 p-3 tap flex items-center gap-3 block">

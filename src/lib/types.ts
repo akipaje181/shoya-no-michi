@@ -205,6 +205,7 @@ export interface XpRules {
   weeklyGoalDays: number; // 週に何日練習したら達成か
   gameRecord: number; // 試合を記録
   goalAchieved: number; // ロードマップの目標達成
+  note: number; // 野球ノートを書く（1日1回）
 }
 
 export interface Settings {
@@ -236,6 +237,21 @@ export interface ScheduleEvent {
   place?: string;
   memo?: string; // 持ち物など
   createdAt: ISOTime;
+}
+
+export type Mood = "great" | "good" | "soso" | "tough";
+
+export interface DiaryNote {
+  id: string;
+  date: ISODate;
+  practice: string; // きょう練習したこと
+  coachWords: string[]; // 監督・コーチに言われたこと（1行ずつ）
+  didWell: string; // できたこと
+  nextGoal: string; // つぎの課題
+  mood?: Mood;
+  parentComment?: string; // パパのひとこと
+  createdAt: ISOTime;
+  updatedAt: ISOTime;
 }
 
 export interface ConsultNote {
@@ -270,6 +286,7 @@ export interface AppData {
   events: ScheduleEvent[];
   rulesRead: string[]; // ルールブックで「読んだ」にした項目 id
   consults: ConsultNote[]; // パパと相談すること
+  notes: DiaryNote[]; // 野球ノート（1日1件）
   stats: GrowthStats;
   updatedAt: ISOTime;
 }

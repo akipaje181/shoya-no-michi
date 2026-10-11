@@ -19,6 +19,7 @@ const sumAmount = (d: AppData, menuId: string) =>
 const practiceDays = (d: AppData) => new Set(d.records.map((r) => r.date)).size;
 const sumGames = (d: AppData, k: "hits" | "runs" | "steals" | "rbi") =>
   d.games.reduce((s, g) => s + (g[k] || 0), 0);
+const noteDays = (d: AppData) => (d.notes || []).filter((n) => n.practice.trim() || n.coachWords.length || n.didWell.trim() || n.nextGoal.trim()).length;
 const careCount = (d: AppData) => d.records.filter((r) => r.menuId.startsWith("care_")).length;
 const fieldingCount = (d: AppData) => d.records.filter((r) => r.menuId === "ground").length;
 
@@ -36,6 +37,9 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   { id: "fielding_master", title: "守備マスター", desc: "ゴロ捕球を50日 練習した", icon: "🧤", tier: "gold", hint: "ゴロ捕球を50日 記録する", check: (d) => fieldingCount(d) >= 50 },
   { id: "care10", title: "道具を大切に", desc: "グローブやスパイクの手入れを10回", icon: "🧤", tier: "bronze", hint: "道具の手入れを10回 記録する", check: (d) => careCount(d) >= 10 },
   { id: "care50", title: "道具の達人", desc: "手入れを50回。道具が一番の相棒", icon: "✨", tier: "silver", hint: "道具の手入れを50回 記録する", check: (d) => careCount(d) >= 50 },
+  { id: "note7", title: "野球ノート 7日", desc: "ノートを7日分 書いた", icon: "📓", tier: "bronze", hint: "野球ノートを7日 書く", check: (d) => noteDays(d) >= 7 },
+  { id: "note30", title: "野球ノート 30日", desc: "ノートが習慣になった", icon: "📓", tier: "silver", hint: "野球ノートを30日 書く", check: (d) => noteDays(d) >= 30 },
+  { id: "coach20", title: "コーチの言葉 20", desc: "言われたことを20個 書きとめた", icon: "🗣️", tier: "silver", hint: "ノートに「コーチに言われたこと」を20個", check: (d) => (d.notes || []).reduce((s, n) => s + n.coachWords.length, 0) >= 20 },
   { id: "rules10", title: "ルールブック読破", desc: "ルールブックを10項目 読んだ", icon: "📖", tier: "bronze", hint: "ルールブックで10項目「読んだ」にする", check: (d) => (d.rulesRead || []).length >= 10 },
   { id: "first_game", title: "初出場", desc: "はじめての試合を記録した", icon: "🏟️", tier: "bronze", hint: "試合を1つ記録する", check: (d) => d.games.length > 0 },
   { id: "first_hit", title: "初ヒット", desc: "試合で初めてのヒット！", icon: "💥", tier: "silver", hint: "試合で安打を記録する", check: (d) => sumGames(d, "hits") >= 1 },

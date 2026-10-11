@@ -1,6 +1,6 @@
 // ゲームロジック：ミッション達成・XP・メダル・アイテム・連続記録
 // すべて「データを受け取って新しいデータを返す」純粋関数。副作用は store 側。
-import type { AppData, GameRecord, GrowthStats, MenuCategory, Measured, PracticeRecord } from "./types";
+import type { AppData, DiaryNote, GameRecord, GrowthStats, MenuCategory, Measured, PracticeRecord } from "./types";
 import { addDays, nowISO, today, uid, weekStart } from "./date";
 import { levelFromXp, totalXp } from "./level";
 import { ACHIEVEMENTS } from "@/data/achievements";
@@ -215,6 +215,28 @@ export function deleteGame(d: AppData, id: string): AppData {
 }
 
 /** ロードマップの目標達成 */
+/** 野球ノートの保存（1日1件に上書き）。XP はその日1回だけ */
+export function saveNote(d: AppData, note: DiaryNote): GainResult {
+  const levelBefore = levelFromXp(totalXp(d)).level;
+  const existing = d.notes.find((n) => n.date === note.date);
+  const merged: DiaryNote = existing ? { ...existing, ...note, id: existing.id, parentComment: note.parentComment ?? existing.parentComment, updatedAt: nowISO() } : note;
+  let next: AppData = { ...d, notes: existing ? d.notes.map((n) => (n.id === existing.id ? merged : n)) : [...d.notes, merged] };
+  const hasContent = !!(merged.practice.trim() || merged.coachWords.length || merged.didWell.trim() || merged.nextGoal.trim());
+  let xpGained = 0;
+  if (hasContent) {
+    const g = grantXp(next, next.settings.xpRules.note, "note", "野球ノートを書いた", `note:${note.date}`, note.date);
+    next = g.data; xpGained = g.granted;
+  }
+  const s = settle(next);
+  return { data: s.data, xpGained, levelBefore, levelAfter: levelFromXp(totalXp(s.data)).level, newAchievements: s.newAchievements, newItems: s.newItems };
+}
+
+export function setNoteParentComment(d: AppData, date: string, comment: string): AppData {
+  const existing = d.notes.find((n) => n.date === date);
+  if (existing) return { ...d, notes: d.notes.map((n) => (n.date === date ? { ...n, parentComment: comment, updatedAt: nowISO() } : n)) };
+  return { ...d, notes: [...d.notes, { id: uid("nt"), date, practice: "", coachWords: [], didWell: "", nextGoal: "", parentComment: comment, createdAt: nowISO(), updatedAt: nowISO() }] };
+}
+
 export function achieveGoal(d: AppData, goalId: string, date = today(), comment?: string): GainResult {
   const levelBefore = levelFromXp(totalXp(d)).level;
   const goals = d.goals.map((g) => (g.id === goalId ? { ...g, achievedAt: date, comment: comment ?? g.comment } : g));

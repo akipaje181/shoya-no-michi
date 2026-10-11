@@ -6,7 +6,7 @@ import { Card, Field, MenuIcon, Modal, PageHeader, Segmented } from "@/component
 import { IMG } from "@/lib/img";
 import { useAppData, updateData, useHydrated, replaceData, resetData, flushSave, getData } from "@/lib/store";
 import { clearBlobs } from "@/lib/media";
-import { careerStats, fmtAvg, practiceDays, streak } from "@/lib/game";
+import { careerStats, fmtAvg, practiceDays, streak, setNoteParentComment } from "@/lib/game";
 import { levelFromXp, totalXp } from "@/lib/level";
 import { addDays, formatJa, nowISO, today, uid } from "@/lib/date";
 import type { AppData, PracticeMenu, MenuCategory, Reward } from "@/lib/types";
@@ -53,7 +53,7 @@ function PinGate({ onUnlock }: { onUnlock: () => void }) {
   );
 }
 
-type Tab = "cheer" | "records" | "rewards" | "menus" | "settings" | "data";
+type Tab = "cheer" | "notes" | "records" | "rewards" | "menus" | "settings" | "data";
 
 function Dashboard({ onLock }: { onLock: () => void }) {
   const data = useAppData();
@@ -63,7 +63,7 @@ function Dashboard({ onLock }: { onLock: () => void }) {
       <PageHeader title="パパの応援" sub="保護者用の管理画面" back="/home" banner={IMG.banner("parent")} right={<button className="btn btn-ghost btn-sm" onClick={onLock}>🔒 ロック</button>} />
       <div className="px-4">
         <div className="scroll-x flex gap-2 pb-1">
-          {([["cheer", "💬 応援"], ["records", "📋 記録"], ["rewards", "🍖 ご褒美"], ["menus", "🎯 メニュー"], ["settings", "⚙️ XP設定"], ["data", "💾 データ"]] as [Tab, string][]).map(([v, l]) => (
+          {([["cheer", "💬 応援"], ["notes", "📓 ノート"], ["records", "📋 記録"], ["rewards", "🍖 ご褒美"], ["menus", "🎯 メニュー"], ["settings", "⚙️ XP設定"], ["data", "💾 データ"]] as [Tab, string][]).map(([v, l]) => (
             <button key={v} className={`chip !px-3 !py-2 !text-sm shrink-0 ${tab === v ? "chip-lime" : ""}`} onClick={() => setTab(v)}>{l}</button>
           ))}
         </div>
@@ -74,6 +74,7 @@ function Dashboard({ onLock }: { onLock: () => void }) {
           {tab === "menus" && <MenusTab />}
           {tab === "settings" && <SettingsTab />}
           {tab === "data" && <DataTab />}
+          {tab === "notes" && <NotesTab />}
         </div>
         <div className="text-[11px] text-muted mt-6">親の名前：{data.settings.parentName}（XP設定で変えられます）</div>
       </div>
@@ -155,6 +156,35 @@ function RecordsTab() {
     </div>
   );
 }
+
+function NotesTab() {
+  const data = useAppData();
+  const notes = [...(data.notes || [])].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 30);
+  const [draft, setDraft] = useState<Record<string, string>>({});
+  if (notes.length === 0) return <Card><div className="text-center text-muted py-3 text-sm">まだノートがありません。奨也が「野球ノート」に書くと、ここに出ます</div></Card>;
+  return (
+    <div>
+      <p className="text-[11px] text-muted mb-2 px-1">奨也のノート。下の欄に「パパのひとこと」を書くと、奨也のノートに表示されます。</p>
+      <div className="flex flex-col gap-2">
+        {notes.map((n) => (
+          <Card key={n.id}>
+            <div className="flex items-center justify-between"><b>{formatJa(n.date)}</b>{n.mood && <span>{MOOD_ICON[n.mood]}</span>}</div>
+            {n.practice && <div className="text-sm mt-1 whitespace-pre-wrap">🏃 {n.practice}</div>}
+            {n.coachWords.length > 0 && <ul className="text-sm mt-1 pl-4 list-disc">{n.coachWords.map((w, i) => <li key={i}>🗣️ {w}</li>)}</ul>}
+            {n.didWell && <div className="text-sm mt-1">👍 {n.didWell}</div>}
+            {n.nextGoal && <div className="text-sm mt-1">🎯 {n.nextGoal}</div>}
+            <div className="flex gap-2 mt-2">
+              <input className="input !min-h-10" placeholder="パパのひとこと" value={draft[n.date] ?? n.parentComment ?? ""} onChange={(e) => setDraft({ ...draft, [n.date]: e.target.value })} />
+              <button className="btn btn-blue btn-sm shrink-0" onClick={() => { updateData((d) => setNoteParentComment(d, n.date, (draft[n.date] ?? n.parentComment ?? "").trim())); pushCelebrate({ type: "text", text: "ひとことを書きました", icon: "👨" }); }}>保存</button>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const MOOD_ICON: Record<string, string> = { great: "😄", good: "🙂", soso: "😐", tough: "😣" };
 
 function ConsultList() {
   const data = useAppData();

@@ -42,7 +42,7 @@ function Practice() {
 
   return (
     <div>
-      <PageHeader title="きょうのミッション" sub={formatJa(t)} right={<Link href="/practice/history" className="btn btn-ghost btn-sm">📅 履歴</Link>} />
+      <PageHeader title="きょうのミッション" sub={formatJa(t)} right={<div className="flex gap-1"><Link href="/note" className="btn btn-blue btn-sm">📓 ノート</Link><Link href="/practice/history" className="btn btn-ghost btn-sm">📅 履歴</Link></div>} />
       <div className="px-4">
         <Card className="flex items-center justify-between">
           <div>
