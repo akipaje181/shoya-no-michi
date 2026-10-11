@@ -2,7 +2,8 @@
 // コーチのアドバイス：記録から選ぶ「きょうの3つ」＋スキル別の一覧＋お父さんと相談するリスト
 import { useState } from "react";
 import Link from "next/link";
-import { Card, PageHeader } from "@/components/ui";
+import { Card, Ic, PageHeader } from "@/components/ui";
+import { CAT_IMG } from "@/lib/img";
 import { useAppData, updateData, useHydrated } from "@/lib/store";
 import { pickToday } from "@/lib/coach";
 import { CAT_ICON, CAT_LABEL, TIPS, type CoachCat, type Tip } from "@/data/coach";
@@ -46,7 +47,7 @@ export default function CoachPage() {
 
         <div className="font-display text-lg mt-6 mb-2 px-1">📚 スキル別のアドバイス</div>
         <div className="scroll-x flex gap-2 pb-1">
-          {CATS.map((c) => <button key={c} className={`chip !px-3 !py-2 !text-sm shrink-0 ${cat === c ? "chip-lime" : ""}`} onClick={() => setCat(c)}>{CAT_ICON[c]} {CAT_LABEL[c]}</button>)}
+          {CATS.map((c) => <button key={c} className={`chip !px-3 !py-2 !text-sm shrink-0 ${cat === c ? "chip-lime" : ""}`} onClick={() => setCat(c)}><Ic name={CAT_IMG[c]} emoji={CAT_ICON[c]} size={22} /> {CAT_LABEL[c]}</button>)}
         </div>
         <div className="flex flex-col gap-2 mt-2">
           {TIPS.filter((t) => t.cat === cat).map((t) => <TipCard key={t.id} tip={t} collapsed onConsult={() => addConsult(`${t.title}：${t.ask}`, t.id)} />)}
@@ -85,7 +86,7 @@ function TipCard({ tip, reason, collapsed, onConsult }: { tip: Tip; reason?: str
       <summary className="list-none p-4 cursor-pointer tap">
         {reason && <div className="chip chip-blue mb-1">{reason}</div>}
         <div className="flex items-center gap-2">
-          <span className="text-xl">{CAT_ICON[tip.cat]}</span>
+          <Ic name={CAT_IMG[tip.cat]} emoji={CAT_ICON[tip.cat]} size={28} />
           <span className="font-bold flex-1">{tip.title}</span>
           <span className="text-muted text-sm">›</span>
         </div>

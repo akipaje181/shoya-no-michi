@@ -119,7 +119,7 @@ export function Empty({ text = "まだ記録がありません", sub }: { text?:
   );
 }
 
-export function Field({ label, children, hint }: { label: string; children: ReactNode; hint?: string }) {
+export function Field({ label, children, hint }: { label: ReactNode; children: ReactNode; hint?: string }) {
   return (
     <label className="block mb-3">
       <div className="text-xs font-bold text-muted mb-1">{label}</div>
@@ -184,6 +184,13 @@ export function MenuIcon({ menu, size = 44, className = "" }: { menu: Pick<Pract
   const src = IMG.menu(menu.id);
   if (!src) return <span className={className} style={{ fontSize: size * 0.6, lineHeight: 1 }}>{menu.icon}</span>;
   return <img src={src} alt="" className={`object-contain ${className}`} style={{ width: size, height: size }} draggable={false} />;
+}
+
+/** 絵文字の代わりの画像アイコン。画像が無ければ絵文字 */
+export function Ic({ name, emoji, size = 24, className = "" }: { name?: string; emoji: string; size?: number; className?: string }) {
+  const src = IMG.ic(name);
+  if (!src) return <span className={`inline-block text-center align-middle ${className}`} style={{ fontSize: size * 0.8, lineHeight: `${size}px`, width: size, height: size }}>{emoji}</span>;
+  return <img src={src} alt="" className={`inline-block object-contain align-middle ${className}`} style={{ width: size, height: size }} draggable={false} />;
 }
 
 /** 称号バッジ（レベルで変わる） */

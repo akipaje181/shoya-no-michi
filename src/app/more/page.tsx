@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
-import { Card, PageHeader } from "@/components/ui";
+import { Card, Ic, PageHeader } from "@/components/ui";
+import { NAV_ICON } from "@/lib/img";
 import { useAppData, updateData, useHydrated } from "@/lib/store";
 import { unreadNotesForParent } from "@/lib/notify";
 
@@ -120,7 +121,7 @@ function Guide({ item }: { item: Item }) {
   return (
     <details className="card p-0 overflow-hidden group">
       <summary className="list-none p-4 flex items-center gap-3 tap cursor-pointer">
-        <span className="text-2xl w-10 text-center shrink-0">{item.icon}</span>
+        <Ic name={NAV_ICON[item.href]} emoji={item.icon} size={40} className="shrink-0" />
         <div className="flex-1 min-w-0">
           <div className="font-bold flex items-center gap-2">
             {item.label}

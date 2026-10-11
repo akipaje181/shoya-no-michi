@@ -2,7 +2,7 @@
 // 写真・動画の共通部品：サムネ・再生・追加（複数可）・編集・「この日の写真と動画」
 import { useRef, useState } from "react";
 import Link from "next/link";
-import { Field, Modal } from "./ui";
+import { Field, Ic, Modal } from "./ui";
 import { useMediaState } from "./Avatar";
 import { deleteCloudPhoto } from "@/lib/sync";
 import { useAppData, updateData } from "@/lib/store";
@@ -119,7 +119,7 @@ export function DayMedia({ date }: { date: string }) {
   return (
     <div className="mb-3">
       <div className="flex items-center justify-between mb-1">
-        <div className="text-xs font-bold text-muted">📷🎬 この日の写真・動画 {list.length > 0 && <span className="chip !text-[10px]">{list.length}</span>}</div>
+        <div className="text-xs font-bold text-muted flex items-center gap-1"><Ic name="nav-album" emoji="📷" size={22} /> この日の写真・動画 {list.length > 0 && <span className="chip !text-[10px]">{list.length}</span>}</div>
         <button type="button" className="btn btn-blue btn-sm !min-h-8" onClick={() => fileRef.current?.click()}>＋ 追加</button>
       </div>
       <input ref={fileRef} type="file" accept="image/*,video/*" multiple className="hidden" onChange={(e) => { setPending(pickFiles(e.target.files)); e.target.value = ""; }} />

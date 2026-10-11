@@ -3,7 +3,8 @@
 import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Card, PageHeader, ProgressBar } from "@/components/ui";
+import { Card, PageHeader, ProgressBar , Ic} from "@/components/ui";
+import { RULE_IMG } from "@/lib/img";
 import { useAppData, updateData, useHydrated } from "@/lib/store";
 import { RULE_COUNT, RULE_SECTIONS, RULE_SOURCES } from "@/data/rules";
 import { settle } from "@/lib/game";
@@ -53,14 +54,14 @@ function Rules() {
         {!query && (
           <div className="scroll-x flex gap-2 mt-3 pb-1">
             {RULE_SECTIONS.map((s) => (
-              <button key={s.id} className={`chip !px-3 !py-2 !text-sm shrink-0 ${open === s.id ? "chip-lime" : ""}`} onClick={() => setOpen(s.id)}>{s.icon} {s.title}</button>
+              <button key={s.id} className={`chip !px-3 !py-2 !text-sm shrink-0 ${open === s.id ? "chip-lime" : ""}`} onClick={() => setOpen(s.id)}><Ic name={RULE_IMG[s.id]} emoji={s.icon} size={22} /> {s.title}</button>
             ))}
           </div>
         )}
 
         {sections.filter((s) => query || s.id === open).map((s) => (
           <div key={s.id} className="mt-3">
-            <div className="font-display text-lg px-1">{s.icon} {s.title}</div>
+            <div className="font-display text-lg px-1 flex items-center gap-2"><Ic name={RULE_IMG[s.id]} emoji={s.icon} size={30} /> {s.title}</div>
             <p className="text-xs text-muted px-1 mb-2">{s.intro}</p>
             <div className="flex flex-col gap-2">
               {s.rules.map((r) => {

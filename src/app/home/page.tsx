@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import Avatar from "@/components/Avatar";
-import { Card, MenuIcon, ProgressBar, RankBadge, Stat } from "@/components/ui";
+import { Card, Ic, MenuIcon, ProgressBar, RankBadge, Stat } from "@/components/ui";
 import { useAppData, useHydrated } from "@/lib/store";
 import { levelFromXp, totalXp } from "@/lib/level";
 import { practiceDays, streak, xpOnDate } from "@/lib/game";
@@ -9,7 +9,7 @@ import { today, formatJa, parseISODate } from "@/lib/date";
 import { DAILY_CHEERS } from "@/data/defaults";
 import { ITEMS } from "@/data/items";
 import { upcoming, relativeLabel, KIND_ICON, KIND_LABEL } from "@/lib/schedule";
-import { IMG } from "@/lib/img";
+import { EVENT_ICON, IMG } from "@/lib/img";
 import { unreadCommentsForChild, unreadNotesForParent } from "@/lib/notify";
 
 export default function Home() {
@@ -101,7 +101,7 @@ export default function Home() {
 
       {/* 野球ノート */}
       <Link href="/note" className="card mt-3 p-3 tap flex items-center gap-3 block">
-        <span className="text-2xl w-9 text-center">📓</span>
+        <Ic name="nav-note" emoji="📓" size={36} />
         <div className="flex-1 min-w-0">
           <div className="font-bold text-sm">野球ノート {todayNote ? <span className="chip chip-lime !text-[10px] ml-1">きょう 書いた</span> : <span className="chip !text-[10px] ml-1">きょうはまだ</span>}</div>
           <div className="text-xs text-muted truncate">{lastCoachWord ? `🗣️ ${lastCoachWord}` : "練習したこと・コーチに言われたことを書こう"}</div>
@@ -111,7 +111,7 @@ export default function Home() {
 
       {/* 予定 */}
       <Link href="/schedule" className="card mt-3 p-3 tap flex items-center gap-3 block">
-        <span className="text-2xl w-9 text-center">📅</span>
+        <Ic name="nav-schedule" emoji="📅" size={36} />
         <div className="flex-1 min-w-0">
           {nextEvents.length === 0 ? (
             <><div className="font-bold text-sm">予定を入れる</div><div className="text-xs text-muted">チーム練習・試合・大会のスケジュール</div></>
@@ -119,7 +119,7 @@ export default function Home() {
             nextEvents.map((e) => (
               <div key={e.id} className="flex items-baseline gap-2 min-w-0">
                 <span className={`text-xs font-bold shrink-0 ${e.date === t ? "text-lime" : "text-blue-2"}`}>{relativeLabel(e.date, t)}</span>
-                <span className="text-sm font-bold truncate">{KIND_ICON[e.kind]} {e.title}{e.time ? ` ${e.time}` : ""}</span>
+                <span className="text-sm font-bold truncate"><Ic name={EVENT_ICON[e.kind]} emoji={KIND_ICON[e.kind]} size={18} /> {e.title}{e.time ? ` ${e.time}` : ""}</span>
               </div>
             ))
           )}
@@ -166,9 +166,9 @@ export default function Home() {
       </Card>
 
       <div className="grid grid-cols-3 gap-2 mt-3">
-        <Link href="/coach" className="card p-3 tap text-center"><div className="text-2xl">🎓</div><div className="text-xs font-bold">コーチの<br />アドバイス</div></Link>
-        <Link href="/growth" className="card p-3 tap text-center"><div className="text-2xl">📈</div><div className="text-xs font-bold">成長<br />グラフ</div></Link>
-        <Link href="/trophies" className="card p-3 tap text-center"><div className="text-2xl">🏅</div><div className="text-xs font-bold">メダル・<br />アイテム</div></Link>
+        <Link href="/coach" className="card p-3 tap text-center"><div><Ic name="nav-coach" emoji="🎓" size={40} /></div><div className="text-xs font-bold">コーチの<br />アドバイス</div></Link>
+        <Link href="/growth" className="card p-3 tap text-center"><div><Ic name="nav-growth" emoji="📈" size={40} /></div><div className="text-xs font-bold">成長<br />グラフ</div></Link>
+        <Link href="/trophies" className="card p-3 tap text-center"><div><Ic name="nav-trophies" emoji="🏅" size={40} /></div><div className="text-xs font-bold">メダル・<br />アイテム</div></Link>
       </div>
     </div>
   );

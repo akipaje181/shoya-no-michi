@@ -2,7 +2,8 @@
 // 予定：チーム練習・試合・大会のスケジュール
 import { useState } from "react";
 import Link from "next/link";
-import { Card, Empty, Field, Modal, PageHeader, Segmented } from "@/components/ui";
+import { Card, Empty, Field, Modal, PageHeader, Segmented , Ic} from "@/components/ui";
+import { EVENT_ICON } from "@/lib/img";
 import { useAppData, updateData, useHydrated } from "@/lib/store";
 import { formatJa, monthLabel, nowISO, toISODate, today, uid } from "@/lib/date";
 import { KIND_COLOR, KIND_ICON, KIND_LABEL, relativeLabel, sortEvents, upcoming } from "@/lib/schedule";
@@ -93,7 +94,7 @@ function EventCard({ e, showDate, onClick }: { e: ScheduleEvent; showDate?: bool
   const isGameDay = (e.kind === "game" || e.kind === "tournament") && e.date <= t;
   return (
     <Card className="flex items-center gap-3" onClick={onClick}>
-      <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0 ${KIND_COLOR[e.kind]}`}>{KIND_ICON[e.kind]}</div>
+      <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0 ${KIND_COLOR[e.kind]}`}><Ic name={EVENT_ICON[e.kind]} emoji={KIND_ICON[e.kind]} size={34} /></div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span className={`chip !text-[10px] ${KIND_COLOR[e.kind]}`}>{KIND_LABEL[e.kind]}</span>

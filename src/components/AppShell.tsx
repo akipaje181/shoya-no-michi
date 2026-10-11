@@ -3,7 +3,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import Celebration from "./Celebration";
-import { IMG } from "@/lib/img";
+import { IMG, NAV_ICON } from "@/lib/img";
+import { Ic } from "./ui";
 import { startSync } from "@/lib/sync";
 
 const TABS = [
@@ -38,7 +39,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                   {t.href === "/player" ? (
                     <img src={IMG.hero.face} alt="" className={`w-7 h-7 rounded-full object-cover object-top bg-navy-3 ${active ? "ring-2 ring-lime scale-110" : "opacity-80"}`} />
                   ) : (
-                    <span className={`text-2xl leading-none ${active ? "scale-110" : ""}`}>{t.icon}</span>
+                    <Ic name={NAV_ICON[t.href]} emoji={t.icon} size={30} className={active ? "scale-110 drop-shadow-[0_0_6px_rgba(168,230,108,0.7)]" : "opacity-60"} />
                   )}
                   {t.label}
                 </Link>

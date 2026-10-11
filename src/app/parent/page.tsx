@@ -2,7 +2,7 @@
 // お父さんの応援（保護者画面）。4桁 PIN で保護
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Card, Field, MenuIcon, Modal, PageHeader, Segmented } from "@/components/ui";
+import { Card, Field, Ic, MenuIcon, Modal, PageHeader, Segmented } from "@/components/ui";
 import { IMG } from "@/lib/img";
 import { useAppData, updateData, useHydrated, replaceData, resetData, flushSave, getData } from "@/lib/store";
 import { clearBlobs } from "@/lib/media";
@@ -70,8 +70,8 @@ function Dashboard({ onLock }: { onLock: () => void }) {
       <PageHeader title="お父さんの応援" sub="保護者用の管理画面" back="/home" banner={IMG.banner("parent")} bannerTitle right={<button className="btn btn-ghost btn-sm" onClick={onLock}>🔒 ロック</button>} />
       <div className="px-4">
         <div className="scroll-x flex gap-2 pb-1">
-          {([["cheer", "💬 応援"], ["notes", "📓 ノート"], ["records", "📋 記録"], ["rewards", "🍖 ご褒美"], ["menus", "🎯 メニュー"], ["settings", "⚙️ XP設定"], ["data", "💾 データ"]] as [Tab, string][]).map(([v, l]) => (
-            <button key={v} className={`chip !px-3 !py-2 !text-sm shrink-0 relative ${tab === v ? "chip-lime" : ""}`} onClick={() => setTab(v)}>{l}{v === "notes" && unread.length > 0 && <span className="badge-dot">{unread.length}</span>}</button>
+          {([["cheer", "💬", "応援", ""], ["notes", "📓", "ノート", "nav-note"], ["records", "📋", "記録", "parent-records"], ["rewards", "🍖", "ご褒美", ""], ["menus", "🎯", "メニュー", "tab-mission"], ["settings", "⚙️", "XP設定", ""], ["data", "💾", "データ", ""]] as [Tab, string, string, string][]).map(([v, em, l, ic]) => (
+            <button key={v} className={`chip !px-3 !py-2 !text-sm shrink-0 relative ${tab === v ? "chip-lime" : ""}`} onClick={() => setTab(v)}><Ic name={ic || undefined} emoji={em} size={20} /> {l}{v === "notes" && unread.length > 0 && <span className="badge-dot">{unread.length}</span>}</button>
           ))}
         </div>
         {tab !== "notes" && unread.length > 0 && (

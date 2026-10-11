@@ -2,7 +2,7 @@
 // 野球ノート：きょう練習したこと・コーチに言われたこと・できたこと・つぎの課題
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Card, Empty, Field, MenuIcon, PageHeader, Segmented } from "@/components/ui";
+import { Card, Empty, Field, Ic, MenuIcon, PageHeader, Segmented } from "@/components/ui";
 import { useAppData, updateData, useHydrated } from "@/lib/store";
 import { markCommentRead, saveNote } from "@/lib/game";
 import { celebrateGain, pushCelebrate } from "@/lib/celebrate";
@@ -140,7 +140,7 @@ function Editor({ date, onDate }: { date: string; onDate: (d: string) => void })
         <Card className="mt-3"><div className="text-center text-muted py-3 text-sm">未来の日付には書けません</div></Card>
       ) : (
         <Card className="mt-3">
-          <Field label="🏃 きょう練習したこと（チーム練習・自主練・試合）">
+          <Field label={<><Ic name="event-practice" emoji="🏃" size={22} /> きょう練習したこと（チーム練習・自主練・試合）</>}>
             <textarea className="input" value={practice} onChange={(e) => setPractice(e.target.value)} placeholder="例：チーム練習。ノック、ティー打撃、紅白戦で2打席" />
           </Field>
           <Field label="🗣️ 監督・コーチに言われたこと（1つずつ追加）" hint="あとで「コーチの言葉」タブでまとめて見返せる">
@@ -160,7 +160,7 @@ function Editor({ date, onDate }: { date: string; onDate: (d: string) => void })
             )}
           </Field>
           <Field label="👍 できたこと"><input className="input" value={didWell} onChange={(e) => setDidWell(e.target.value)} placeholder="例：ゴロを1回もトンネルしなかった" /></Field>
-          <Field label="🎯 つぎの課題"><input className="input" value={nextGoal} onChange={(e) => setNextGoal(e.target.value)} placeholder="例：送球を胸に投げる" /></Field>
+          <Field label={<><Ic name="tab-mission" emoji="🎯" size={22} /> つぎの課題</>}><input className="input" value={nextGoal} onChange={(e) => setNextGoal(e.target.value)} placeholder="例：送球を胸に投げる" /></Field>
           <DayMedia date={date} />
           <Field label="きょうの気分">
             <Segmented value={mood || ("" as Mood)} options={MOODS.map((m) => ({ v: m.v, label: m.label }))} onChange={(v) => setMood(v)} />
