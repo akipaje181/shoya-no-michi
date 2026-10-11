@@ -12,6 +12,8 @@ import { levelFromXp, totalXp } from "@/lib/level";
 import { addDays, formatJa, nowISO, today, uid } from "@/lib/date";
 import type { AppData, PracticeMenu, MenuCategory, Reward } from "@/lib/types";
 import { pushCelebrate } from "@/lib/celebrate";
+import { createFamily, getSyncConfig, joinFamily, setSyncRole, stopSync, subscribeSync, syncAvailable, syncNow, type SyncRole } from "@/lib/sync";
+import { useSyncExternalStore } from "react";
 
 export default function ParentPage() {
   const hydrated = useHydrated();
@@ -393,6 +395,60 @@ function SettingsTab() {
   );
 }
 
+function useSyncConfig() {
+  return useSyncExternalStore(subscribeSync, () => { const c = getSyncConfig(); return c ? JSON.stringify(c) : ""; }, () => "");
+}
+
+function SyncCard() {
+  const raw = useSyncConfig();
+  const cfg = raw ? (JSON.parse(raw) as ReturnType<typeof getSyncConfig>) : null;
+  const [code, setCode] = useState("");
+  const [role, setRole] = useState<SyncRole>("parent");
+  const [busy, setBusy] = useState("");
+  const [err, setErr] = useState("");
+  const run = async (label: string, fn: () => Promise<unknown>) => { setBusy(label); setErr(""); try { await fn(); } catch (e) { setErr((e as Error).message); } finally { setBusy(""); } };
+  if (!syncAvailable()) {
+    return <Card className="mt-3"><div className="font-display text-base mb-1">☁️ 端末どうしの同期</div><p className="text-xs text-white/80">この公開版には同期先の設定が入っていません。<span className="chip chip-gold">準備中</span></p></Card>;
+  }
+  if (!cfg) {
+    return (
+      <Card className="mt-3">
+        <div className="font-display text-base mb-1">☁️ 端末どうしの同期</div>
+        <p className="text-[11px] text-muted mb-3">奨也の iPad とお父さんの iPhone で同じ記録にします。家族だけが知る「家族コード」で結びます。記録はネット上の保管場所（Supabase）に置かれます。写真は縮小版を共有、動画は撮った端末だけに残ります。</p>
+        <Field label="この端末は"><Segmented value={role} options={[{ v: "child" as SyncRole, label: "🧢 奨也の端末" }, { v: "parent" as SyncRole, label: "👨 お父さんの端末" }]} onChange={setRole} /></Field>
+        <div className="font-bold text-sm mt-2 mb-1">はじめての端末なら</div>
+        <button className="btn btn-primary w-full" disabled={!!busy} onClick={() => run("作成中…", async () => { const c = await createFamily(role); alert(`家族コードは ${c} です。もう一方の端末で入れてください`); })}>{busy || "家族コードを作る（この端末の記録を送る）"}</button>
+        <div className="font-bold text-sm mt-4 mb-1">もう一方の端末でコードを作ったなら</div>
+        <div className="flex gap-2">
+          <input className="input font-display tracking-wider uppercase" placeholder="SHOYA-XXXXXXXX" value={code} onChange={(e) => setCode(e.target.value)} autoCapitalize="characters" />
+          <button className="btn btn-blue shrink-0" disabled={!!busy || code.trim().length < 10} onClick={() => run("合体中…", () => joinFamily(code, role))}>{busy || "つなぐ"}</button>
+        </div>
+        <p className="text-[11px] text-muted mt-2">つなぐと、両方の端末の記録が合わさります（どちらも消えません）。</p>
+        {err && <div className="text-xs text-red-300 mt-2">{err}</div>}
+      </Card>
+    );
+  }
+  return (
+    <Card className="mt-3 border-lime/40">
+      <div className="font-display text-base mb-1">☁️ 端末どうしの同期 <span className="chip chip-lime !text-[10px]">オン</span></div>
+      <div className="text-[11px] text-muted">家族コード（もう一方の端末で入れる）</div>
+      <div className="flex items-center gap-2 mt-1">
+        <div className="font-display text-xl tracking-wider flex-1 select-all">{cfg.code}</div>
+        <button className="btn btn-ghost btn-sm" onClick={() => { navigator.clipboard?.writeText(cfg.code).then(() => pushCelebrate({ type: "text", text: "コピーしました", icon: "📋" })).catch(() => undefined); }}>コピー</button>
+      </div>
+      <Field label="この端末は"><Segmented value={cfg.role} options={[{ v: "child" as SyncRole, label: "🧢 奨也の端末" }, { v: "parent" as SyncRole, label: "👨 お父さんの端末" }]} onChange={(v) => setSyncRole(v)} /></Field>
+      <div className="text-xs">{cfg.lastSyncAt ? `最後の同期：${cfg.lastSyncAt.slice(0, 16).replace("T", " ")}` : "まだ同期していません"}</div>
+      {cfg.lastError && <div className="text-xs text-red-300 mt-1">エラー：{cfg.lastError}</div>}
+      <div className="flex gap-2 mt-3">
+        <button className="btn btn-blue btn-sm flex-1" disabled={!!busy} onClick={() => run("同期中…", syncNow)}>{busy || "🔄 いま同期する"}</button>
+        <button className="btn btn-ghost btn-sm" onClick={() => { if (confirm("同期をやめますか？（この端末の記録はそのまま残ります）")) stopSync(); }}>やめる</button>
+      </div>
+      <p className="text-[11px] text-muted mt-2">アプリを開いている間、20秒ごとと記録のたびに同期します。1週間だれも開かないと保管場所が休止することがあります（そのときは Claude に「同期が止まった」と言ってください）。</p>
+      {err && <div className="text-xs text-red-300 mt-2">{err}</div>}
+    </Card>
+  );
+}
+
 function DataTab() {
   const data = useAppData();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -429,10 +485,7 @@ function DataTab() {
           <input ref={fileRef} type="file" accept="application/json,.json" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) importJson(f); e.target.value = ""; }} />
         </div>
       </Card>
-      <Card className="mt-3">
-        <div className="font-display text-base mb-1">☁️ 端末どうしの同期</div>
-        <p className="text-xs text-white/80">iPhone と iPad で同じ記録を見る自動同期（Supabase）は <span className="chip chip-gold">準備中</span>。それまでは「書き出す → もう一方で読み込む」で合わせられます。</p>
-      </Card>
+      <SyncCard />
       <Card className="mt-3 border-red-400/40">
         <div className="font-display text-base mb-1 text-red-300">🗑️ 全部消す</div>
         <p className="text-[11px] text-muted mb-2">記録・写真・動画・設定をすべて消して最初の状態に戻します。もどせません。先に書き出しておいてください。</p>

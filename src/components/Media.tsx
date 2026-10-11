@@ -3,7 +3,8 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { Field, Modal } from "./ui";
-import { useMediaUrl } from "./Avatar";
+import { useMediaState } from "./Avatar";
+import { deleteCloudPhoto } from "@/lib/sync";
 import { useAppData, updateData } from "@/lib/store";
 import { deleteBlob, putBlob, shrinkPhoto, validateFile } from "@/lib/media";
 import { formatJa, nowISO, today, uid } from "@/lib/date";
@@ -30,13 +31,15 @@ export function pickFiles(files: FileList | File[] | null | undefined): Pending[
 }
 
 export function Tile({ m }: { m: MediaAsset }) {
-  const url = useMediaUrl(m.id);
+  const { url, missing } = useMediaState(m.id);
+  if (missing) return <div className="w-full h-full flex flex-col items-center justify-center text-[10px] text-muted text-center px-1"><span className="text-xl">📱</span>撮った端末にだけ<br />あります</div>;
   if (!url) return <div className="w-full h-full flex items-center justify-center text-2xl">{m.kind === "video" ? "🎬" : "🖼️"}</div>;
   return m.kind === "video" ? <video src={url} className="w-full h-full object-cover" muted playsInline preload="metadata" /> : <img src={url} alt="" className="w-full h-full object-cover" />;
 }
 
 export function Player({ id, kind, controls = true }: { id: string; kind: "photo" | "video"; controls?: boolean }) {
-  const url = useMediaUrl(id);
+  const { url, missing } = useMediaState(id);
+  if (missing) return <div className="aspect-video rounded-xl bg-black/30 flex flex-col items-center justify-center text-muted text-sm text-center px-4"><span className="text-3xl mb-1">📱</span>{kind === "video" ? "動画は撮った端末にだけ保存されています" : "この写真はまだ届いていません"}</div>;
   if (!url) return <div className="aspect-video rounded-xl bg-black/30 flex items-center justify-center text-muted">読み込み中…</div>;
   return kind === "video" ? <video src={url} className="w-full rounded-xl bg-black" controls={controls} playsInline /> : <img src={url} alt="" className="w-full rounded-xl" />;
 }
@@ -58,7 +61,7 @@ function ViewModalInner({ m, onClose }: { m: MediaAsset; onClose: () => void }) 
       </div>
       <Field label="メモ"><textarea className="input" value={comment} onChange={(e) => setComment(e.target.value)} placeholder="例：ティー打撃。ひじが下がらないように" /></Field>
       <div className="flex gap-2">
-        <button className="btn btn-danger btn-sm" onClick={async () => { if (!confirm("この動画・写真を消しますか？（もどせません）")) return; await deleteBlob(m.id); updateData((d) => ({ ...d, media: d.media.filter((x) => x.id !== m.id), goals: d.goals.map((g) => ({ ...g, mediaIds: g.mediaIds.filter((x) => x !== m.id) })), games: d.games.map((g) => ({ ...g, mediaIds: g.mediaIds.filter((x) => x !== m.id) })), profile: d.profile.photoId === m.id ? { ...d.profile, photoId: undefined, avatar: { ...d.profile.avatar, usePhoto: false } } : d.profile })); onClose(); }}>消す</button>
+        <button className="btn btn-danger btn-sm" onClick={async () => { if (!confirm("この動画・写真を消しますか？（もどせません）")) return; await deleteBlob(m.id); deleteCloudPhoto(m.id); updateData((d) => ({ ...d, media: d.media.filter((x) => x.id !== m.id), goals: d.goals.map((g) => ({ ...g, mediaIds: g.mediaIds.filter((x) => x !== m.id) })), games: d.games.map((g) => ({ ...g, mediaIds: g.mediaIds.filter((x) => x !== m.id) })), profile: d.profile.photoId === m.id ? { ...d.profile, photoId: undefined, avatar: { ...d.profile.avatar, usePhoto: false } } : d.profile })); onClose(); }}>消す</button>
         <Link href={`/note/?date=${date}`} className="btn btn-ghost btn-sm">📓 この日のノート</Link>
         <button className="btn btn-primary flex-1" onClick={() => { updateData((d) => ({ ...d, media: d.media.map((x) => (x.id === m.id ? { ...x, comment: comment.trim(), tag, date } : x)) })); onClose(); }}>保存</button>
       </div>

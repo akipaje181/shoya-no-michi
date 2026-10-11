@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import Celebration from "./Celebration";
 import { IMG } from "@/lib/img";
+import { startSync } from "@/lib/sync";
 
 const TABS = [
   { href: "/home", icon: "🏠", label: "ホーム" },
@@ -22,6 +23,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     const base = process.env.NEXT_PUBLIC_BASE_PATH || "";
     navigator.serviceWorker.register(`${base}/sw.js`).catch(() => undefined);
   }, []);
+  useEffect(() => { startSync(); }, []);
 
   return (
     <>

@@ -5,6 +5,8 @@ import Character from "./Character";
 import type { AppData } from "@/lib/types";
 import { ITEM_BY_ID, type ItemDef } from "@/data/items";
 import { getBlob } from "@/lib/media";
+import { getData } from "@/lib/store";
+import { fetchCloudPhoto } from "@/lib/sync";
 import { IMG, type HeroPose } from "@/lib/img";
 
 export function equippedItems(d: AppData): Partial<Record<ItemDef["slot"], ItemDef>> {
@@ -17,23 +19,35 @@ export function equippedItems(d: AppData): Partial<Record<ItemDef["slot"], ItemD
   return out;
 }
 
-export function useMediaUrl(id?: string): string | null {
-  const [loaded, setLoaded] = useState<{ id: string; url: string } | null>(null);
+/** 写真・動画の URL。端末に無い写真は同期先から取ってくる。missing = この端末に無く、取れもしなかった */
+export function useMediaState(id?: string): { url: string | null; missing: boolean } {
+  const [loaded, setLoaded] = useState<{ id: string; url: string | null } | null>(null);
   useEffect(() => {
     if (!id) return;
     let u: string | null = null;
     let alive = true;
-    getBlob(id).then((b) => {
-      if (!alive || !b) return;
-      u = URL.createObjectURL(b);
-      setLoaded({ id, url: u });
-    });
+    getBlob(id)
+      .then(async (b) => {
+        if (b) return b;
+        const m = getData().media.find((x) => x.id === id);
+        return m ? await fetchCloudPhoto(m) : null;
+      })
+      .then((b) => {
+        if (!alive) return;
+        if (!b) { setLoaded({ id, url: null }); return; }
+        u = URL.createObjectURL(b);
+        setLoaded({ id, url: u });
+      });
     return () => {
       alive = false;
       if (u) URL.revokeObjectURL(u);
     };
   }, [id]);
-  return id && loaded && loaded.id === id ? loaded.url : null;
+  const hit = id && loaded && loaded.id === id ? loaded : null;
+  return { url: hit?.url ?? null, missing: !!hit && hit.url === null };
+}
+export function useMediaUrl(id?: string): string | null {
+  return useMediaState(id).url;
 }
 
 export default function Avatar({ data, size = 200, pose = "stand", forceCharacter }: { data: AppData; size?: number; pose?: HeroPose; forceCharacter?: boolean }) {

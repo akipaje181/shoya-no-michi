@@ -134,6 +134,7 @@ export interface MediaAsset {
   date: ISODate;
   tag: MediaTag;
   comment?: string;
+  cloud?: boolean; // 写真を同期先（Supabase）に送り終えたか
   createdAt: ISOTime;
 }
 
@@ -291,5 +292,6 @@ export interface AppData {
   consults: ConsultNote[]; // お父さんと相談すること
   notes: DiaryNote[]; // 野球ノート（1日1件）
   stats: GrowthStats;
+  tombstones?: string[]; // 消した記録の id（端末間の同期で、消したものが復活しないように）
   updatedAt: ISOTime;
 }

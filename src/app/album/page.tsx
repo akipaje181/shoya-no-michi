@@ -73,7 +73,7 @@ export default function AlbumPage() {
             ))}
           </div>
         )}
-        <p className="text-[11px] text-muted mt-3 px-1">写真や動画はこの端末の中にだけ保存される（ネットには上がらない）。日付をタップした先の野球ノートでも、その日の写真・動画を見たり足したりできる。</p>
+        <p className="text-[11px] text-muted mt-3 px-1">写真・動画はこの端末の中に保存される。「端末どうしの同期」をオンにしていると写真（縮小版）はもう一方の端末にも届く。動画は撮った端末だけ。日付の「📓 ノート」でその日の野球ノートへ。</p>
       </div>
       <ViewModal m={sel} onClose={() => setSel(null)} />
       <AddModal pending={pending} onClose={() => setPending([])} />

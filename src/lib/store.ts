@@ -83,10 +83,31 @@ export function isHydrated(): boolean {
 
 let saveTimer: ReturnType<typeof setTimeout> | null = null;
 
+// 同期のために「消した記録」を覚える（配列ごとの id の取り出し方）
+export const ID_FIELDS: { [K in keyof AppData]?: (x: unknown) => string } = {
+  records: (x) => (x as { id: string }).id, games: (x) => (x as { id: string }).id, goals: (x) => (x as { id: string }).id, media: (x) => (x as { id: string }).id,
+  messages: (x) => (x as { id: string }).id, rewards: (x) => (x as { id: string }).id, events: (x) => (x as { id: string }).id, consults: (x) => (x as { id: string }).id,
+  notes: (x) => (x as { id: string }).id, menus: (x) => (x as { id: string }).id, xp: (x) => (x as { id: string }).id, quiz: (x) => (x as { id: string }).id,
+  achievements: (x) => (x as { id: string }).id, inventory: (x) => (x as { itemId: string }).itemId, completions: (x) => (x as { key: string }).key,
+  restDays: (x) => `rest:${(x as { date: string }).date}`,
+};
+function collectTombstones(before: AppData, after: AppData): string[] {
+  const out = after.tombstones ? [...after.tombstones] : [];
+  for (const k of Object.keys(ID_FIELDS) as (keyof AppData)[]) {
+    const get = ID_FIELDS[k]!;
+    const b = before[k] as unknown[] | undefined, a = after[k] as unknown[] | undefined;
+    if (!Array.isArray(b) || !Array.isArray(a) || b.length <= a.length && b === a) continue;
+    const ids = new Set(a.map(get));
+    for (const x of b) { const id = get(x); if (!ids.has(id)) out.push(`${k}:${id}`); }
+  }
+  return out.length > 3000 ? out.slice(-3000) : out;
+}
+
 /** データを更新する。fn は新しいオブジェクトを返す（元を書き換えない） */
 export function updateData(fn: (d: AppData) => AppData): AppData {
   const cur = ensure();
-  const next = { ...fn(cur), updatedAt: nowISO() };
+  const applied = fn(cur);
+  const next = { ...applied, tombstones: collectTombstones(cur, applied), updatedAt: nowISO() };
   state = next;
   listeners.forEach((l) => l());
   if (saveTimer) clearTimeout(saveTimer);
@@ -102,6 +123,7 @@ export function replaceData(d: AppData): void {
 }
 
 export function resetData(): void {
+  try { localStorage.removeItem("shoya.sync"); } catch { /* ignore */ }
   state = makeDefaultData(nowISO());
   store.save(state);
   listeners.forEach((l) => l());
@@ -113,6 +135,7 @@ function subscribe(l: () => void) {
     listeners.delete(l);
   };
 }
+export const subscribeData = subscribe;
 
 /** React から使う。SSR 時は初期値、ブラウザでは保存データ */
 export function useAppData(): AppData {

@@ -56,14 +56,14 @@ Safari で公開 URL を開く → 共有ボタン → 「ホーム画面に追�
 お父さんの応援 → 💾 データ → 「書き出す」で JSON ファイルを保存（iCloud Drive などへ）。
 別の端末で「読み込む」と同じ記録になる。写真・動画はバックアップに含まれない。
 
-## Supabase（端末間の自動同期・まだ未接続）
-今は端末内保存のみ。`src/lib/store.ts` の `DataStore` を Supabase 版に差し替えれば同期できる構造。
-やるときの手順：
-1. supabase.com でプロジェクト作成（無料枠）
-2. `docs/設計.md` §4 の型をもとにテーブルを作る（`player_profiles`, `practice_records`, `game_records`, `goals`, `xp_transactions`, `media_assets` …）
-3. RLS を有効にし、保護者アカウントのみ読み書きできるポリシーにする
-4. `.env.local` に `NEXT_PUBLIC_SUPABASE_URL` と `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-5. `src/lib/store.ts` に `SupabaseStore` を実装し、起動時に localStorage とマージ
+## 端末どうしの同期（Supabase）
+お父さんの応援 → 💾 データ → 「☁️ 端末どうしの同期」。はじめの端末で「家族コードを作る」、もう一方で「つなぐ」。以後はアプリを開いている間、自動で同じ記録になる（写真は縮小版を共有、動画は撮った端末だけ）。
+
+- 保管場所：Supabase プロジェクト `akipaje181's Project`（東京リージョン、無料枠）。表 `shoya_families`（家族コード→記録 JSON）と `shoya_photos`
+- 安全：表には直接アクセスできず（RLS・ポリシー無し）、家族コードを渡す RPC 関数だけが使える。コードは 8 文字のランダム（SHOYA-XXXXXXXX）
+- 鍵：`NEXT_PUBLIC_SUPABASE_URL`／`NEXT_PUBLIC_SUPABASE_ANON_KEY` は GitHub の Secrets に入れてあり、公開ビルド時に埋め込まれる。ローカルは `.env.local`（git には入れない）
+- 無料枠は 1 週間アクセスが無いと休止する。止まったら Claude に「同期が止まった」と言う（Supabase の restore_project で再開）
+- 仕組みの詳細は `docs/進捗.md` v1.5
 
 ## データの場所
 - 記録：`localStorage["shoya.road.v1"]`（1つ前の版 `.bak` も保持）
