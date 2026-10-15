@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Card, Field, Ic, MenuIcon, Modal, PageHeader, Segmented } from "@/components/ui";
-import { IMG } from "@/lib/img";
+import { IMG, MOOD_IMG } from "@/lib/img";
 import { useAppData, updateData, useHydrated, replaceData, resetData, flushSave, getData } from "@/lib/store";
 import { clearBlobs } from "@/lib/media";
 import { careerStats, fmtAvg, practiceDays, streak, setNoteParentComment, markNotesReadByParent } from "@/lib/game";
@@ -70,7 +70,7 @@ function Dashboard({ onLock }: { onLock: () => void }) {
       <PageHeader title="お父さんの応援" sub="保護者用の管理画面" back="/home" banner={IMG.banner("parent")} bannerTitle right={<button className="btn btn-ghost btn-sm" onClick={onLock}>🔒 ロック</button>} />
       <div className="px-4">
         <div className="scroll-x flex gap-2 pb-1">
-          {([["cheer", "💬", "応援", ""], ["notes", "📓", "ノート", "nav-note"], ["records", "📋", "記録", "parent-records"], ["rewards", "🍖", "ご褒美", ""], ["menus", "🎯", "メニュー", "tab-mission"], ["settings", "⚙️", "XP設定", ""], ["data", "💾", "データ", ""]] as [Tab, string, string, string][]).map(([v, em, l, ic]) => (
+          {([["cheer", "💬", "応援", "parent-cheer"], ["notes", "📓", "ノート", "nav-note"], ["records", "📋", "記録", "parent-records"], ["rewards", "🍖", "ご褒美", "parent-rewards"], ["menus", "🎯", "メニュー", "tab-mission"], ["settings", "⚙️", "XP設定", "parent-settings"], ["data", "💾", "データ", "parent-data"]] as [Tab, string, string, string][]).map(([v, em, l, ic]) => (
             <button key={v} className={`chip !px-3 !py-2 !text-sm shrink-0 relative ${tab === v ? "chip-lime" : ""}`} onClick={() => setTab(v)}><Ic name={ic || undefined} emoji={em} size={20} /> {l}{v === "notes" && unread.length > 0 && <span className="badge-dot">{unread.length}</span>}</button>
           ))}
         </div>
@@ -187,7 +187,7 @@ function NotesTab() {
       <div className="flex flex-col gap-2">
         {notes.map((n) => (
           <Card key={n.id} className={newDates.includes(n.date) ? "border-lime/60" : ""}>
-            <div className="flex items-center justify-between"><b>{formatJa(n.date)}{newDates.includes(n.date) && <span className="chip chip-lime !text-[10px] ml-2">NEW</span>}</b>{n.mood && <span>{MOOD_ICON[n.mood]}</span>}</div>
+            <div className="flex items-center justify-between"><b>{formatJa(n.date)}{newDates.includes(n.date) && <span className="chip chip-lime !text-[10px] ml-2">NEW</span>}</b>{n.mood && <Ic name={MOOD_IMG[n.mood]} emoji={MOOD_ICON[n.mood]} size={28} />}</div>
             {n.practice && <div className="text-sm mt-1 whitespace-pre-wrap">🏃 {n.practice}</div>}
             {n.coachWords.length > 0 && <ul className="text-sm mt-1 pl-4 list-disc">{n.coachWords.map((w, i) => <li key={i}>🗣️ {w}</li>)}</ul>}
             {n.didWell && <div className="text-sm mt-1">👍 {n.didWell}</div>}
@@ -349,7 +349,7 @@ function NotifyCard() {
   };
   return (
     <Card className="mt-3">
-      <div className="font-display text-base mb-1">🔔 ホーム画面の数字と通知</div>
+      <div className="font-display text-base mb-1 flex items-center gap-2"><Ic name="parent-notify" emoji="🔔" size={26} /> ホーム画面の数字と通知</div>
       <p className="text-[11px] text-muted mb-2">奨也がノートを書いたとき／お父さんがひとことを書いたときに、端末の通知センターに出し、ホーム画面のアイコンに未読の数字を出します。iPhone は「ホーム画面に追加」したアプリだけ対応（iOS 16.4 以上）。{isStandalone() ? "いまはホーム画面のアイコンから開いています。" : "いまは Safari で開いています。"}</p>
       <div className="text-sm mb-2">{label[status]}</div>
       {(status === "default" || status === "denied") && <button className="btn btn-primary w-full" onClick={ask}>🔔 オンにする</button>}

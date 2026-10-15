@@ -94,12 +94,13 @@ function BigCard({ item, onNext }: { item: Big; onNext: () => void }) {
     visual = (
       <div className="relative flex items-center justify-center">
         <img src={IMG.scene.cheer} alt="" className="h-44 w-44 object-cover rounded-3xl border-2 border-lime/70 shadow-xl" />
+        {IMG.ic("levelup") && <img src={IMG.ic("levelup")!} alt="" className="absolute -top-3 -left-4 w-20 h-20 object-contain pop" />}
         <div className="absolute -bottom-1 right-0 font-display text-4xl text-lime drop-shadow-[0_3px_0_rgba(0,0,0,0.5)]">Lv.{item.level}</div>
       </div>
     );
   } else if (item.kind === "comment") {
     icon = "💬"; title = "お知らせ"; sub = `${item.from}からひとこと`; desc = "";
-    visual = <img src={IMG.papa} alt="" className="w-36 h-36 object-contain drop-shadow-[0_0_24px_rgba(36,123,222,0.6)]" />;
+    visual = <img src={IMG.ic("papa-face") || IMG.papa} alt="" className="w-36 h-36 object-contain drop-shadow-[0_0_24px_rgba(36,123,222,0.6)]" />;
   } else if (item.kind === "medal") {
     const d = ACH_BY_ID[item.id];
     icon = d?.icon || "🏅"; title = d?.tier === "trophy" ? "TROPHY GET!" : "MEDAL GET!"; sub = d?.title || ""; desc = d?.desc || "";

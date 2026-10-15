@@ -8,7 +8,7 @@ import { markCommentRead, saveNote } from "@/lib/game";
 import { celebrateGain, pushCelebrate } from "@/lib/celebrate";
 import { addDays, formatJa, nowISO, today, uid } from "@/lib/date";
 import type { DiaryNote, Mood } from "@/lib/types";
-import { IMG } from "@/lib/img";
+import { IMG, MOOD_IMG } from "@/lib/img";
 import { DayMedia } from "@/components/Media";
 import { showLocalNotification } from "@/lib/notify";
 
@@ -55,7 +55,7 @@ function Note() {
             ) : (
               written.map((n) => (
                 <Card key={n.id} onClick={() => { setDate(n.date); setTab("write"); }}>
-                  <div className="flex items-center justify-between"><b>{formatJa(n.date, true)}</b>{n.mood && <span className="text-xl">{MOOD_ICON[n.mood]}</span>}</div>
+                  <div className="flex items-center justify-between"><b>{formatJa(n.date, true)}</b>{n.mood && <Ic name={MOOD_IMG[n.mood]} emoji={MOOD_ICON[n.mood]} size={30} />}</div>
                   {n.practice && <div className="text-sm mt-1 line-clamp-2">🏃 {n.practice}</div>}
                   {mediaCount(n.date) > 0 && <div className="text-xs mt-1 text-muted">📷🎬 写真・動画 {mediaCount(n.date)} 件</div>}
                   {n.coachWords.length > 0 && <div className="text-sm mt-1 text-lime line-clamp-2">🗣️ {n.coachWords.join(" ／ ")}</div>}
@@ -127,7 +127,7 @@ function Editor({ date, onDate }: { date: string; onDate: (d: string) => void })
 
       {(recs.length > 0 || game || events.length > 0) && (
         <Card className="mt-3">
-          <div className="text-[11px] font-bold text-lime mb-1">📋 この日の記録（自動）</div>
+          <div className="text-[11px] font-bold text-lime mb-1 flex items-center gap-1"><Ic name="note-auto" emoji="📋" size={20} /> この日の記録（自動）</div>
           <div className="flex flex-wrap gap-1">
             {events.map((e) => <span key={e.id} className="chip chip-blue">📅 {e.title}</span>)}
             {recs.map((r) => { const m = menuOf(r.menuId); return <span key={r.id} className="chip inline-flex items-center gap-1">{m ? <MenuIcon menu={m} size={16} /> : "📝"}{m?.name} {r.amount}{m?.unit === "min" ? "分" : "回"}</span>; })}
@@ -143,7 +143,7 @@ function Editor({ date, onDate }: { date: string; onDate: (d: string) => void })
           <Field label={<><Ic name="event-practice" emoji="🏃" size={22} /> きょう練習したこと（チーム練習・自主練・試合）</>}>
             <textarea className="input" value={practice} onChange={(e) => setPractice(e.target.value)} placeholder="例：チーム練習。ノック、ティー打撃、紅白戦で2打席" />
           </Field>
-          <Field label="🗣️ 監督・コーチに言われたこと（1つずつ追加）" hint="あとで「コーチの言葉」タブでまとめて見返せる">
+          <Field label={<><Ic name="note-coach" emoji="🗣️" size={22} /> 監督・コーチに言われたこと（1つずつ追加）</>} hint="あとで「コーチの言葉」タブでまとめて見返せる">
             <div className="flex gap-2">
               <input className="input" value={word} onChange={(e) => setWord(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addWord(); } }} placeholder="例：ゴロは正面に入る" />
               <button type="button" className="btn btn-blue btn-sm shrink-0" onClick={addWord} disabled={!word.trim()}>追加</button>
@@ -159,11 +159,11 @@ function Editor({ date, onDate }: { date: string; onDate: (d: string) => void })
               </ul>
             )}
           </Field>
-          <Field label="👍 できたこと"><input className="input" value={didWell} onChange={(e) => setDidWell(e.target.value)} placeholder="例：ゴロを1回もトンネルしなかった" /></Field>
+          <Field label={<><Ic name="note-didwell" emoji="👍" size={22} /> できたこと</>}><input className="input" value={didWell} onChange={(e) => setDidWell(e.target.value)} placeholder="例：ゴロを1回もトンネルしなかった" /></Field>
           <Field label={<><Ic name="tab-mission" emoji="🎯" size={22} /> つぎの課題</>}><input className="input" value={nextGoal} onChange={(e) => setNextGoal(e.target.value)} placeholder="例：送球を胸に投げる" /></Field>
           <DayMedia date={date} />
           <Field label="きょうの気分">
-            <Segmented value={mood || ("" as Mood)} options={MOODS.map((m) => ({ v: m.v, label: m.label }))} onChange={(v) => setMood(v)} />
+            <Segmented value={mood || ("" as Mood)} options={MOODS.map((m) => ({ v: m.v, label: <span className="flex flex-col items-center gap-0.5"><Ic name={MOOD_IMG[m.v]} emoji={m.label.slice(0, 2).trim()} size={34} /><span className="text-[11px]">{m.label.slice(2).trim()}</span></span> }))} onChange={(v) => setMood(v)} />
           </Field>
           {existing?.parentComment && (
             <div className="rounded-xl bg-blue/20 px-3 py-2 text-sm mb-3 flex items-center gap-2"><img src={IMG.papa} alt="" className="w-8 h-8 object-contain" /><span><b className="text-blue-2">{data.settings.parentName}のひとこと：</b>{existing.parentComment}{existing.parentCommentAt && <span className="text-[10px] text-muted ml-1">{formatJa(existing.parentCommentAt.slice(0, 10))}</span>}</span></div>

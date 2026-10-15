@@ -162,7 +162,7 @@ export function NumberStepper({ value, onChange, step = 1, min = 0, max = 99999,
   );
 }
 
-export function Segmented<T extends string>({ value, options, onChange }: { value: T; options: { v: T; label: string }[]; onChange: (v: T) => void }) {
+export function Segmented<T extends string>({ value, options, onChange }: { value: T; options: { v: T; label: ReactNode }[]; onChange: (v: T) => void }) {
   return (
     <div className="flex rounded-xl bg-black/25 p-1 gap-1">
       {options.map((o) => (

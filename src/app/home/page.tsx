@@ -43,7 +43,7 @@ export default function Home() {
           <div className="font-display text-lime text-[10px] tracking-[0.3em]">SHOYA&apos;S ROAD</div>
           <div className="font-display text-xl">{formatJa(t)}</div>
         </div>
-        <Link href="/parent" className="chip chip-blue relative">👨 {data.settings.parentName}{parentUnread > 0 && <span className="badge-dot">{parentUnread}</span>}</Link>
+        <Link href="/parent" className="chip chip-blue relative !py-0.5"><Ic name="papa-face" emoji="👨" size={24} className="rounded-full" /> {data.settings.parentName}{parentUnread > 0 && <span className="badge-dot">{parentUnread}</span>}</Link>
       </div>
 
       {/* 選手カード */}
