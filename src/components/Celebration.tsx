@@ -100,7 +100,7 @@ function BigCard({ item, onNext }: { item: Big; onNext: () => void }) {
     );
   } else if (item.kind === "comment") {
     icon = "💬"; title = "お知らせ"; sub = `${item.from}からひとこと`; desc = "";
-    visual = <img src={IMG.ic("papa-face") || IMG.papa} alt="" className="w-36 h-36 object-contain drop-shadow-[0_0_24px_rgba(36,123,222,0.6)]" />;
+    visual = <img src={IMG.ic("papa-face") || IMG.papa} alt="" className="w-36 h-36 object-cover rounded-2xl drop-shadow-[0_0_24px_rgba(36,123,222,0.6)]" />;
   } else if (item.kind === "medal") {
     const d = ACH_BY_ID[item.id];
     icon = d?.icon || "🏅"; title = d?.tier === "trophy" ? "TROPHY GET!" : "MEDAL GET!"; sub = d?.title || ""; desc = d?.desc || "";

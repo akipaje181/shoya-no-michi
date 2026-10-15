@@ -187,7 +187,7 @@ function NotesTab() {
       <div className="flex flex-col gap-2">
         {notes.map((n) => (
           <Card key={n.id} className={newDates.includes(n.date) ? "border-lime/60" : ""}>
-            <div className="flex items-center justify-between"><b>{formatJa(n.date)}{newDates.includes(n.date) && <span className="chip chip-lime !text-[10px] ml-2">NEW</span>}</b>{n.mood && <Ic name={MOOD_IMG[n.mood]} emoji={MOOD_ICON[n.mood]} size={28} />}</div>
+            <div className="flex items-center justify-between"><b>{formatJa(n.date)}{newDates.includes(n.date) && <span className="chip chip-lime !text-[10px] ml-2">NEW</span>}</b>{n.mood && <Ic name={MOOD_IMG[n.mood]} emoji={MOOD_ICON[n.mood]} size={28} className="rounded-lg" />}</div>
             {n.practice && <div className="text-sm mt-1 whitespace-pre-wrap">🏃 {n.practice}</div>}
             {n.coachWords.length > 0 && <ul className="text-sm mt-1 pl-4 list-disc">{n.coachWords.map((w, i) => <li key={i}>🗣️ {w}</li>)}</ul>}
             {n.didWell && <div className="text-sm mt-1">👍 {n.didWell}</div>}

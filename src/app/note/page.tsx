@@ -55,7 +55,7 @@ function Note() {
             ) : (
               written.map((n) => (
                 <Card key={n.id} onClick={() => { setDate(n.date); setTab("write"); }}>
-                  <div className="flex items-center justify-between"><b>{formatJa(n.date, true)}</b>{n.mood && <Ic name={MOOD_IMG[n.mood]} emoji={MOOD_ICON[n.mood]} size={30} />}</div>
+                  <div className="flex items-center justify-between"><b>{formatJa(n.date, true)}</b>{n.mood && <Ic name={MOOD_IMG[n.mood]} emoji={MOOD_ICON[n.mood]} size={30} className="rounded-lg" />}</div>
                   {n.practice && <div className="text-sm mt-1 line-clamp-2">🏃 {n.practice}</div>}
                   {mediaCount(n.date) > 0 && <div className="text-xs mt-1 text-muted">📷🎬 写真・動画 {mediaCount(n.date)} 件</div>}
                   {n.coachWords.length > 0 && <div className="text-sm mt-1 text-lime line-clamp-2">🗣️ {n.coachWords.join(" ／ ")}</div>}
@@ -163,7 +163,7 @@ function Editor({ date, onDate }: { date: string; onDate: (d: string) => void })
           <Field label={<><Ic name="tab-mission" emoji="🎯" size={22} /> つぎの課題</>}><input className="input" value={nextGoal} onChange={(e) => setNextGoal(e.target.value)} placeholder="例：送球を胸に投げる" /></Field>
           <DayMedia date={date} />
           <Field label="きょうの気分">
-            <Segmented value={mood || ("" as Mood)} options={MOODS.map((m) => ({ v: m.v, label: <span className="flex flex-col items-center gap-0.5"><Ic name={MOOD_IMG[m.v]} emoji={m.label.slice(0, 2).trim()} size={34} /><span className="text-[11px]">{m.label.slice(2).trim()}</span></span> }))} onChange={(v) => setMood(v)} />
+            <Segmented value={mood || ("" as Mood)} options={MOODS.map((m) => ({ v: m.v, label: <span className="flex flex-col items-center gap-0.5"><Ic name={MOOD_IMG[m.v]} emoji={m.label.slice(0, 2).trim()} size={34} className="rounded-lg" /><span className="text-[11px]">{m.label.slice(2).trim()}</span></span> }))} onChange={(v) => setMood(v)} />
           </Field>
           {existing?.parentComment && (
             <div className="rounded-xl bg-blue/20 px-3 py-2 text-sm mb-3 flex items-center gap-2"><img src={IMG.papa} alt="" className="w-8 h-8 object-contain" /><span><b className="text-blue-2">{data.settings.parentName}のひとこと：</b>{existing.parentComment}{existing.parentCommentAt && <span className="text-[10px] text-muted ml-1">{formatJa(existing.parentCommentAt.slice(0, 10))}</span>}</span></div>
