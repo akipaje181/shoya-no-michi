@@ -79,6 +79,11 @@ export function mergeData(local: AppData, remote: AppData): AppData {
         if (k === "messages") m = { ...m, readAt: (x as Keyed).readAt || r.readAt };
         if (k === "media") m = { ...m, cloud: !!(x as Keyed).cloud || !!r.cloud };
         if (k === "consults") m = { ...m, doneAt: (x as Keyed).doneAt || r.doneAt };
+        if (k === "analyses") { // ファイルは両方の端末で足したものを合わせる
+          const fs = new Map<string, unknown>();
+          for (const f of [...((r.files as { id: string }[]) || []), ...(((x as Keyed).files as { id: string }[]) || [])]) fs.set(f.id, f);
+          m = { ...m, files: [...fs.entries()].filter(([fid]) => !dead.has(`analysisFile:${fid}`)).map(([, f]) => f) };
+        }
         if (k === "goals") m = { ...m, achievedAt: (x as Keyed).achievedAt || r.achievedAt, mediaIds: [...new Set([...((x as Keyed).mediaIds as string[] || []), ...((r.mediaIds as string[]) || [])])] };
       }
       map.set(id, m);

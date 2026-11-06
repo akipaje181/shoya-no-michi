@@ -119,6 +119,7 @@ export function makeDefaultData(nowISO: string): AppData {
     rulesRead: [],
     consults: [],
     notes: [],
+    analyses: [],
     stats: DEFAULT_STATS,
     updatedAt: nowISO,
   };

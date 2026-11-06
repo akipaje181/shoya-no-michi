@@ -44,3 +44,5 @@ next-env.d.ts
 .claude/launch.json
 .env
 .env.local
+# 分析資料（PDF・スライド・動画）はアプリに含めない
+バッティング分析/

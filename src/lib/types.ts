@@ -270,6 +270,28 @@ export interface RestDay {
   date: ISODate;
 }
 
+// 分析（投球・打撃・守備・走塁・盗塁ごとの分析資料）
+export type AnalysisCategory = "pitching" | "batting" | "fielding" | "running" | "stealing";
+export type AnalysisFileKind = "pdf" | "photo" | "video" | "slides" | "other";
+export interface AnalysisFile {
+  id: string; // IndexedDB のキー（ファイルの実体はこの端末だけ）
+  name: string;
+  mime: string;
+  size: number;
+  kind: AnalysisFileKind;
+  addedAt: ISOTime;
+}
+export interface AnalysisDoc {
+  id: string;
+  category: AnalysisCategory;
+  date: ISODate;
+  title: string;
+  memo?: string;
+  files: AnalysisFile[];
+  createdAt: ISOTime;
+  updatedAt: ISOTime;
+}
+
 export interface AppData {
   version: number;
   profile: PlayerProfile;
@@ -291,6 +313,7 @@ export interface AppData {
   rulesRead: string[]; // ルールブックで「読んだ」にした項目 id
   consults: ConsultNote[]; // お父さんと相談すること
   notes: DiaryNote[]; // 野球ノート（1日1件）
+  analyses: AnalysisDoc[]; // 分析資料
   stats: GrowthStats;
   tombstones?: string[]; // 消した記録の id（端末間の同期で、消したものが復活しないように）
   updatedAt: ISOTime;
